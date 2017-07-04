@@ -25,17 +25,19 @@ from flask import request
 from flask import jsonify
 from flask import abort
 
-from ontobio.ontobio.golr.golr_query import GolrSearchQuery
-from ontobio.ontobio.golr.golr_query import GolrAssociationQuery
+import requests
+
+from ontobio.golr.golr_query import GolrSearchQuery
+from ontobio.golr.golr_query import GolrAssociationQuery
 
 app = Flask(__name__)
 
 @app.route('/')
 def hello_world():
     response = {}
-    response['author'] = 'Lance Hannestad'
     response['wraps'] = 'https://api.monarchinitiative.org/api/'
-    response['name'] = 'biolink'
+    response['name'] = 'biolink knowledge beacon'
+    response['github'] = 'https://github.com/NCATS-Tangerine/beacon-validator'
     return jsonify(response)
 
 @app.route('/concepts/')
@@ -49,13 +51,18 @@ def get_concepts():
     if keywords == None or pageSize < 1 or pageNumber < 1:
         abort(404)
 
-    q = GolrSearchQuery(term=keywords, category=semgroups, rows=pageSize, start=pageNumber)
+    q = GolrSearchQuery(
+        term=keywords,
+        category=build_categories(semgroups),
+        rows=pageSize,
+        start=pageNumber
+    )
+
     results = q.exec()
 
     concepts = []
-    print('len:', len(results['docs']))
     for d in results['docs']:
-        concept = parse_consept(d)
+        concept = parse_concept(d)
         concepts.append(concept)
 
     return jsonify(concepts)
@@ -63,13 +70,9 @@ def get_concepts():
 @app.route('/concepts/<string:conceptId>/')
 @app.route('/concepts/<string:conceptId>')
 def get_concept_details(conceptId):
-    q = GolrSearchQuery(term=conceptId, rows=5)
-    results = q.exec()
-    concepts = []
-    for d in results['docs']:
-        if get_concept_property(d, 'id') == conceptId:
-            concepts.append(parse_consept(d))
-    return jsonify(concepts)
+    r = requests.get('https://api.monarchinitiative.org/api/bioentity/' + conceptId + '?rows=1')
+    concept = parse_concept(r.json())
+    return jsonify([concept])
 
 @app.route('/statements/')
 @app.route('/statements')
@@ -83,23 +86,29 @@ def get_statements():
     if c == [] or pageSize < 1 or pageNumber < 1:
         abort(404)
 
-    q = GolrAssociationQuery(subject_or_object_ids=c, rows=pageSize, start=pageNumber)
+    q = GolrAssociationQuery(
+        subject_or_object_ids=c,
+        subject_or_object_category=build_categories(semgroups),
+        rows=pageSize,
+        start=pageNumber,
+    )
+
     results = q.exec()
 
     key_pairs = { 'id' : 'id', 'name' : 'label' }
 
     statements = []
-    print('len:', len(results['associations']))
     for d in results['associations']:
         try:
             statement = {}
             statement['id'] = d['id']
-            statement['object'] = { k1 : d['object'][k2] for k1, k2 in key_pairs.items() }
-            statement['subject'] = { k1 : d['subject'][k2] for k1, k2 in key_pairs.items() }
-            statement['predicate'] = {k1 : d['relation'][k2] for k1, k2 in key_pairs.items() }
-            statements.append(statement)
+            statement['object'] = {k1 : d['object'].get(k2, None) for k1, k2 in key_pairs.items() }
+            statement['subject'] = {k1 : d['subject'].get(k2, None) for k1, k2 in key_pairs.items() }
+            statement['predicate'] = {k1 : d['relation'].get(k2, None) for k1, k2 in key_pairs.items() }
         except:
-            None
+            pass
+
+        statements.append(statement)
 
     return jsonify(statements)
 
@@ -107,7 +116,7 @@ def get_statements():
 @app.route('/evidence/<string:statementId>')
 def get_evidence(statementId):
     evidence = {}
-    evidence['date'] = '3000-01-01'
+    evidence['date'] = '2017-05-10'
     evidence['id'] = 'https://monarchinitiative.org/'
     evidence['label'] = 'From the Monarch Initiative'
 
@@ -119,16 +128,10 @@ def get_evidence(statementId):
 def get_exactmatches_by_conceptId(conceptId):
     q = GolrSearchQuery(term=conceptId, rows=5)
     results = q.exec()
-    # return jsonify(results)
 
     d = results['docs']
 
-    for concept in d:
-        if concept['id'] == conceptId:
-            exactmatches = get_concept_property(concept, 'equivalent_curie')
-            exactmatches = [] if exactmatches == None else exactmatches
-            return jsonify(exactmatches)
-    return jsonify([])
+    return jsonify(find_exactmaches(conceptId))
 
 @app.route('/exactmatches/')
 @app.route('/exactmatches')
@@ -142,6 +145,21 @@ def get_exactmatches_by_concept_id_list():
         for conceptId in c:
             exactmatches.append(find_exactmatches(conceptId))
         return jsonify(exactmatches)
+
+def find_exactmaches(conceptId):
+    """
+    Returns a set of concept ID's that are exact maches for the given conceptId
+    """
+    q = GolrSearchQuery(term=conceptId, rows=5)
+    results = q.exec()
+
+    docs = results['docs']
+
+    for d in docs:
+        if get_concept_property(d, 'id') == conceptId:
+            exactmatches = get_concept_property(d, 'equivalent_curie')
+            return jsonify([]) if exactmatches == None else exactmatches
+    return jsonify([])
 
 def get_concept_property(d, key):
     """
@@ -165,22 +183,7 @@ def get_concept_property(d, key):
                 None
     return None
 
-def find_exactmaches(conceptId):
-    """
-    Returns a set of concept ID's that are exact maches for the given conceptId
-    """
-    q = GolrSearchQuery(term=conceptId, rows=5)
-    results = q.exec()
-
-    docs = results['docs']
-
-    for d in docs:
-        if get_concept_property(d, 'id') == conceptId:
-            exactmatches = get_concept_property(d, 'equivalent_curie')
-            return [] if exactmatches == None else exactmatches
-    return []
-
-def parse_consept(d):
+def parse_concept(d):
     """
     Returns a dict in the form of a tkbio concept
 
@@ -189,20 +192,92 @@ def parse_consept(d):
     d : dict
         representing a monarch bioentity
     """
-    key_pairs = {                       \
-        'id' : 'id',                    \
-        'synonyms' : 'synonym',         \
-        'definition' : 'definition',    \
-        'semanticGroup' : 'category',   \
-        'name' : 'label'                \
+    key_pairs = {
+        'id' : 'id',
+        'synonyms' : 'synonym',
+        'definition' : 'definition',
+        'semanticGroup' : 'category',
+        'name' : 'label'
     }
 
     concept = { k1 : get_concept_property(d, k2) for k1, k2 in key_pairs.items() }
 
-    # These properties are encoded as lists in monarch, but we need them to be strings
-    keys = 'synonyms', 'definition', 'semanticGroup', 'name'
+    # These properties are sometimes encoded as lists, but we need them to be strings
+    keys = 'definition', 'semanticGroup', 'name'
     for key in keys:
-        if concept[key] is not None:
+        if isinstance(concept[key], list):
             concept[key] = ', '.join(concept[key])
 
+    # Sometimes bioentities have a 'categories' rather than 'category' field
+    categories = d.get('categories', None)
+    if concept['semanticGroup'] is None and categories is not None:
+        concept['semanticGroup'] = ' '.join(monarch_to_UMLS(categories))
+    else:
+        concept['semanticGroup'] = monarch_to_UMLS(concept['semanticGroup'])
+
     return concept
+
+def build_categories(semgroups):
+    """
+    Returns a list of ontobio categories or None
+
+    Parameters
+    ----------
+    semgroups : string
+        a space deliminated collection of semgroups
+    """
+    if semgroups is None:
+        return None
+
+    categories = []
+    for semgroup in semgroups.split(' '):
+        try:
+            categories += UMLS_to_monarch(semgroup.upper())
+        except:
+            None
+
+    if len(categories) == 0:
+        return None
+    else:
+        return categories
+
+# TODO: Make sure that this mapping makes sense!
+# https://github.com/monarch-initiative/SciGraph-docker-monarch-data/blob/master/src/main/resources/monarchLoadConfiguration.yaml.tmpl#L74-L113
+
+semantic_mapping = {
+    'GENE' : ['gene', 'genotype', 'reagent targeted gene', 'intrinsic genotype', 'extrinsic genotype', 'effective genotype', 'haplotype', 'chromosome'],
+    'ANAT' : ['anatomical entity', 'cellular component'],
+    'LIVB' : ['cell', 'multi-cellular organism', 'organism'],
+    'OBJC' : ['quality', 'cell line', 'molecular entity', 'variant locus', 'sequence alteration', 'sequence feature', 'evidence', 'pathway', 'publication', 'case', 'association'],
+    'DISO' : ['disease'],
+    'PROC' : ['assay'],
+    'CONC' : ['age'],
+    'CHEM' : ['drug', 'protein'],
+    'PHYS' : ['Phenotype', 'molecular function'],
+    'PHEN' : ['biological process'],
+    # Nothing fits in these categories?
+    'ACTI' : [''],
+    'DEVI' : [''],
+    'GEOG' : [''],
+    'OCCU' : [''],
+    'ORGA' : ['']
+}
+
+def UMLS_to_monarch(semgroup):
+    if semgroup is None: return None
+
+    if isinstance(semgroup, (list, set)):
+        return list({ UMLS_to_monarch(c) for c in semgroup })
+    else:
+        return semantic_mapping.get(semgroup.upper(), None)
+
+def monarch_to_UMLS(category):
+    if category is None: return 'OBJC'
+
+    if isinstance(category, (list, set)):
+        return list({ monarch_to_UMLS(c) for c in category })
+    else:
+        for key, value in semantic_mapping.items():
+            if category in value:
+                return key
+        return 'OBJC'
