@@ -2,7 +2,32 @@
 
 Monarch Biolink Knowledge Beacon implementation (as a Python Flask application).
 
-To use this project you must [install flask](http://flask.pocoo.org/docs/0.12/installation/#installation) and [ontobio](http://ontobio.readthedocs.io/en/latest/installation.html). Then in the terminal run the project as described in the [flask quickstart](http://flask.pocoo.org/docs/0.12/quickstart/).
+## Quickstart (Using Docker) ##
+
+At the moment Docker is only available to Linux users. Docker can be installed through a shell script available online.
+
+```shell
+wget https://get.docker.com -O install.sh
+sh install.sh
+```
+Then with Docker installed, you can build an image from the `Dockerfile` provided in the main directory of this project.
+
+```shell
+cd biolink-beacon
+docker build -t ncats:biolink .
+```
+
+Within the Docker container, the Flask app is set to run at `0.0.0.0:5000`. You can re-map ports when you run a Docker image with the `-p` flag.
+
+```shell
+docker run -p 8080:5000 ncats:biolink
+```
+
+Now open your browser to `localhost:8080` to see the application running.
+
+## Running the Server Outside Docker ##
+
+You must [install flask](http://flask.pocoo.org/docs/0.12/installation/#installation) and [ontobio](http://ontobio.readthedocs.io/en/latest/installation.html). Then in the terminal run the project as described in the [flask quickstart](http://flask.pocoo.org/docs/0.12/quickstart/).
 
 On Linux and OSX:
 
@@ -18,11 +43,15 @@ $ set FLASK_APP=main.py
 $ flask run
 ```
 
-By default it runs at [http://127.0.0.1:5000/](http://127.0.0.1:5000/).
+By default it runs at [http://127.0.0.1:5000/](http://127.0.0.1:5000/). You can change the host and port with `-h` and `-p` flags as such:
+
+```shell
+$ flask run -h 0.0.0.0 -p 8080
+```
 
 Make sure you are using the latest version of python. It is recommended that you install and use this project from within a [virtual environment](http://python-guide-pt-br.readthedocs.io/en/latest/dev/virtualenvs/).
 
-# issues
+## Issues ##
 - I have made assumptions about how Monarch's semantic categories should be mapped onto the UMLS semantic types that TKBio uses. These assumptions may not be correct, and should be reviewed by the user.
 - Many of Monarch's bioentities have multiple semantic categories, but our API requires that the semanticGroup property be a string. For now I have concatenated multiple semantic categories into a single space delimited string.
 - For evidence Monarch offers "evidence graphs" which are much like TKBio's concept maps. The monarchinitiative API produces images of these evidence graphs. For now I will just return the same general evidence response for all statements. In the future we may wish to also return images representing the evidence graphs, though.
