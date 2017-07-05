@@ -1,4 +1,5 @@
-# biolink-beacon
+# biolink-beacon #
+
 Monarch Biolink Knowledge Beacon implementation (as a Python Flask application).
 
 To use this project you must [install flask](http://flask.pocoo.org/docs/0.12/installation/#installation) and [ontobio](http://ontobio.readthedocs.io/en/latest/installation.html). Then in the terminal run the project as described in the [flask quickstart](http://flask.pocoo.org/docs/0.12/quickstart/).
@@ -19,7 +20,7 @@ $ flask run
 
 By default it runs at [http://127.0.0.1:5000/](http://127.0.0.1:5000/).
 
-Make sure you are using the latest version of python. It is recomended that you install and use this project from within a [virtual environment](http://python-guide-pt-br.readthedocs.io/en/latest/dev/virtualenvs/).
+Make sure you are using the latest version of python. It is recommended that you install and use this project from within a [virtual environment](http://python-guide-pt-br.readthedocs.io/en/latest/dev/virtualenvs/).
 
 # issues
 - I have made assumptions about how Monarch's semantic categories should be mapped onto the UMLS semantic types that TKBio uses. These assumptions may not be correct, and should be reviewed by the user.
