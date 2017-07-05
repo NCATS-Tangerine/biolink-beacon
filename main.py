@@ -29,6 +29,12 @@ import requests
 
 from ontobio.golr.golr_query import GolrSearchQuery
 from ontobio.golr.golr_query import GolrAssociationQuery
+from ontobio.config import session
+
+# Set absolute path of configuration file
+import os
+abspath = os.path.abspath(os.path.dirname(__file__))
+session.default_config_path = abspath + '/conf/config.yaml'
 
 app = Flask(__name__)
 
@@ -90,7 +96,7 @@ def get_statements():
         subject_or_object_ids=c,
         subject_or_object_category=build_categories(semgroups),
         rows=pageSize,
-        start=pageNumber,
+        start=pageNumber
     )
 
     results = q.exec()
@@ -126,11 +132,6 @@ def get_evidence(statementId):
 @app.route('/exactmatches/<string:conceptId>/')
 @app.route('/exactmatches/<string:conceptId>')
 def get_exactmatches_by_conceptId(conceptId):
-    q = GolrSearchQuery(term=conceptId, rows=5)
-    results = q.exec()
-
-    d = results['docs']
-
     return jsonify(find_exactmaches(conceptId))
 
 @app.route('/exactmatches/')
@@ -150,7 +151,10 @@ def find_exactmaches(conceptId):
     """
     Returns a set of concept ID's that are exact maches for the given conceptId
     """
-    q = GolrSearchQuery(term=conceptId, rows=5)
+    q = GolrSearchQuery(
+        term=conceptId,
+        rows=5
+    )
     results = q.exec()
 
     docs = results['docs']
@@ -269,7 +273,9 @@ def UMLS_to_monarch(semgroup):
     if isinstance(semgroup, (list, set)):
         return list({ UMLS_to_monarch(c) for c in semgroup })
     else:
-        return semantic_mapping.get(semgroup.upper(), None)
+        # None translates to any semantic category, an empty string translates
+        # to no semantic category.
+        return semantic_mapping.get(semgroup.upper(), '')
 
 def monarch_to_UMLS(category):
     if category is None: return 'OBJC'
