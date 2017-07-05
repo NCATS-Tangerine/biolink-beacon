@@ -42,8 +42,8 @@ app = Flask(__name__)
 def hello_world():
     response = {}
     response['wraps'] = 'https://api.monarchinitiative.org/api/'
-    response['name'] = 'biolink knowledge beacon'
-    response['github'] = 'https://github.com/NCATS-Tangerine/beacon-validator'
+    response['name'] = 'Monarch Biolink Knowledge Beacon'
+    response['github'] = 'https://github.com/NCATS-Tangerine/biolink-beacon'
     return jsonify(response)
 
 @app.route('/concepts/')
