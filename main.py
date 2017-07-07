@@ -61,7 +61,7 @@ def get_concepts():
         term=keywords,
         category=build_categories(semgroups),
         rows=pageSize,
-        start=pageNumber * pageSize
+        start=getStartIndex(pageNumber, pageSize)
     )
 
     results = q.exec()
@@ -96,7 +96,7 @@ def get_statements():
         subject_or_object_ids=c,
         subject_or_object_category=build_categories(semgroups),
         rows=pageSize,
-        start=pageNumber * pageSize
+        start=getStartIndex(pageNumber, pageSize)
     )
 
     results = q.exec()
@@ -287,3 +287,11 @@ def monarch_to_UMLS(category):
             if category in value:
                 return key
         return 'OBJC'
+
+def getStartIndex(pageNumber, pageSize):
+    """
+    Monarch begins its indexing at zero, and start refers to the index of
+    the data rather than the page number. This method calculates the start index
+    from the pageNumber and pageSize
+    """
+    return (pageNumber - 1) * pageSize
