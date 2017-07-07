@@ -61,7 +61,7 @@ def get_concepts():
         term=keywords,
         category=build_categories(semgroups),
         rows=pageSize,
-        start=pageNumber
+        start=pageNumber * pageSize
     )
 
     results = q.exec()
@@ -96,7 +96,7 @@ def get_statements():
         subject_or_object_ids=c,
         subject_or_object_category=build_categories(semgroups),
         rows=pageSize,
-        start=pageNumber
+        start=pageNumber * pageSize
     )
 
     results = q.exec()
