@@ -132,7 +132,7 @@ def get_evidence(statementId):
 @app.route('/exactmatches/<string:conceptId>/')
 @app.route('/exactmatches/<string:conceptId>')
 def get_exactmatches_by_conceptId(conceptId):
-    return jsonify(find_exactmaches(conceptId))
+    return jsonify(find_exactmatches(conceptId))
 
 @app.route('/exactmatches/')
 @app.route('/exactmatches')
@@ -144,26 +144,22 @@ def get_exactmatches_by_concept_id_list():
     else:
         exactmatches = []
         for conceptId in c:
-            exactmatches.append(find_exactmatches(conceptId))
+            exactmatches += find_exactmatches(conceptId)
         return jsonify(exactmatches)
 
-def find_exactmaches(conceptId):
+def find_exactmatches(conceptId):
     """
-    Returns a set of concept ID's that are exact maches for the given conceptId
+    Returns a list of concept ID's that are exact maches for the given conceptId
     """
-    q = GolrSearchQuery(
-        term=conceptId,
-        rows=5
-    )
+    q = GolrSearchQuery(term=conceptId, rows=5)
     results = q.exec()
-
     docs = results['docs']
 
     for d in docs:
         if get_concept_property(d, 'id') == conceptId:
             exactmatches = get_concept_property(d, 'equivalent_curie')
-            return jsonify([]) if exactmatches == None else exactmatches
-    return jsonify([])
+            return exactmatches if exactmatches != None else []
+    return []
 
 def get_concept_property(d, key):
     """
