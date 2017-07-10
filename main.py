@@ -87,7 +87,7 @@ def get_statements():
     semgroups = request.args.get('semgroups', None)
     pageSize = int(request.args.get('pageSize', 1))
     pageNumber = int(request.args.get('pageNumber', 1))
-    c = request.args.getlist('c')
+    c = getlist('c')
 
     if c == [] or pageSize < 1 or pageNumber < 1:
         abort(404)
@@ -96,7 +96,8 @@ def get_statements():
         subject_or_object_ids=c,
         subject_or_object_category=build_categories(semgroups),
         rows=pageSize,
-        start=getStartIndex(pageNumber, pageSize)
+        start=getStartIndex(pageNumber, pageSize),
+        non_null_fields=['relation']
     )
 
     results = q.exec()
@@ -107,14 +108,16 @@ def get_statements():
     for d in results['associations']:
         try:
             statement = {}
+
             statement['id'] = d['id']
-            statement['object'] = {k1 : d['object'].get(k2, None) for k1, k2 in key_pairs.items() }
-            statement['subject'] = {k1 : d['subject'].get(k2, None) for k1, k2 in key_pairs.items() }
-            statement['predicate'] = {k1 : d['relation'].get(k2, None) for k1, k2 in key_pairs.items() }
+            statement['object'] = {k1 : d['object'][k2] for k1, k2 in key_pairs.items() }
+            statement['subject'] = {k1 : d['subject'][k2] for k1, k2 in key_pairs.items() }
+            statement['predicate'] = {k1 : d['relation'][k2] for k1, k2 in key_pairs.items() }
+
+            statements.append(statement)
+
         except:
             pass
-
-        statements.append(statement)
 
     return jsonify(statements)
 
@@ -137,7 +140,7 @@ def get_exactmatches_by_conceptId(conceptId):
 @app.route('/exactmatches/')
 @app.route('/exactmatches')
 def get_exactmatches_by_concept_id_list():
-    c = request.args.getlist('c')
+    c = getlist('c')
 
     if c == []:
         abort(404)
@@ -291,3 +294,14 @@ def getStartIndex(pageNumber, pageSize):
     from the pageNumber and pageSize
     """
     return (pageNumber - 1) * pageSize
+
+def getlist(param_name):
+    """
+    Flask only handles lists like /statements?c=ABC&c=DEF&c=GHI
+    But at the moment TKBio is formatting lists like /statements?c=ABC,DEF,GHI
+    """
+    l = request.args.getlist(param_name)
+    c = []
+    for item in l:
+        c += item.split(',')
+    return [item.strip() for item in c]
