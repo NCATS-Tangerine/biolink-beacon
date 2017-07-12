@@ -54,8 +54,8 @@ def get_concepts():
     pageSize = int(request.args.get('pageSize', 1))
     pageNumber = int(request.args.get('pageNumber', 1))
 
-    if keywords == None or pageSize < 1 or pageNumber < 1:
-        abort(404)
+    validatePagination(pageSize, pageNumber)
+    validateKeywords(keywords)
 
     q = GolrSearchQuery(
         term=keywords,
@@ -77,6 +77,8 @@ def get_concepts():
 @app.route('/concepts/<string:conceptId>')
 def get_concept_details(conceptId):
     r = requests.get('https://api.monarchinitiative.org/api/bioentity/' + conceptId + '?rows=1')
+    if r.status_code is not 200:
+        abort(500, 'Monarch request failed. Dumping response: ' + r.text)
     concept = parse_concept(r.json())
     return jsonify([concept])
 
@@ -89,8 +91,8 @@ def get_statements():
     pageNumber = int(request.args.get('pageNumber', 1))
     c = getlist('c')
 
-    if c == [] or pageSize < 1 or pageNumber < 1:
-        abort(404)
+    validatePagination(pageNumber, pageSize)
+    validateIdList(c)
 
     q = GolrAssociationQuery(
         subject_or_object_ids=c,
@@ -141,14 +143,12 @@ def get_exactmatches_by_conceptId(conceptId):
 @app.route('/exactmatches')
 def get_exactmatches_by_concept_id_list():
     c = getlist('c')
+    validateIdList(c)
 
-    if c == []:
-        abort(404)
-    else:
-        exactmatches = []
-        for conceptId in c:
-            exactmatches += find_exactmatches(conceptId)
-        return jsonify(exactmatches)
+    exactmatches = []
+    for conceptId in c:
+        exactmatches += find_exactmatches(conceptId)
+    return jsonify(exactmatches)
 
 def find_exactmatches(conceptId):
     """
@@ -166,7 +166,7 @@ def find_exactmatches(conceptId):
 
 def get_concept_property(d, key):
     """
-    Exhausts each affix before returning nothing.
+    Exhausts each affix before returning an empty string.
 
     Parameters
     ----------
@@ -183,7 +183,7 @@ def get_concept_property(d, key):
             try:
                 return d[key + affix]
             except:
-                None
+                pass
     return None
 
 def parse_concept(d):
@@ -217,6 +217,12 @@ def parse_concept(d):
         concept['semanticGroup'] = ' '.join(monarch_to_UMLS(categories))
     else:
         concept['semanticGroup'] = monarch_to_UMLS(concept['semanticGroup'])
+
+    if concept['definition'] is None:
+        concept['definition'] = ""
+
+    if concept['synonyms'] == None:
+        concept['synonyms'] = []
 
     return concept
 
@@ -305,3 +311,17 @@ def getlist(param_name):
     for item in l:
         c += item.split(',')
     return [item.strip() for item in c]
+
+def validatePagination(pageSize, pageNumber):
+    if pageSize < 1:
+        abort(500, 'pageSize must be greater than zero')
+    if pageNumber < 1:
+        abort(500, 'pageNumber must be greater than zero')
+
+def validateKeywords(keywords):
+    if keywords is None:
+        abort(500, 'keywords must not be empty')
+
+def validateIdList(c):
+    if c is []:
+        abort(500, 'list c must not be empty')
