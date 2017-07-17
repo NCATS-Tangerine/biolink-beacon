@@ -1,7 +1,6 @@
 FROM ubuntu:14.04
 
 COPY main.py /home/main.py
-COPY conf/config.yaml /home/conf/config.yaml
 
 RUN apt-get -y update
 # It complains if apt-utils is not installed
@@ -21,6 +20,4 @@ ENV LC_ALL C.UTF-8
 ENV LANG C.UTF-8
 ENV FLASK_APP=/home/main.py
 
-ENTRYPOINT ["flask", "run", "-h", "0.0.0.0"]
-
-# RUN flask run -h 0.0.0.0
+ENTRYPOINT ["flask", "run", "-h", "0.0.0.0", "-p", "5000"]
