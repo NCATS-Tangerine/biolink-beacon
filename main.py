@@ -29,12 +29,6 @@ import requests
 
 from ontobio.golr.golr_query import GolrSearchQuery
 from ontobio.golr.golr_query import GolrAssociationQuery
-from ontobio.config import session
-
-# Set absolute path of configuration file
-import os
-abspath = os.path.abspath(os.path.dirname(__file__))
-session.default_config_path = abspath + '/conf/config.yaml'
 
 app = Flask(__name__)
 
@@ -149,6 +143,24 @@ def get_exactmatches_by_concept_id_list():
     for conceptId in c:
         exactmatches += find_exactmatches(conceptId)
     return jsonify(exactmatches)
+
+@app.route('/types/')
+@app.route('/types')
+def get_types():
+    frequency = {semgroup : 0 for semgroup in semantic_mapping.keys()}
+
+    q = GolrSearchQuery(
+        rows=0,
+        facet_fields=['category']
+    )
+    results = q.exec()
+    facet_counts = results['facet_counts']
+    categories = facet_counts['category']
+
+    for key in categories:
+        frequency[monarch_to_UMLS(key)] += categories[key]
+
+    return jsonify([{'id' : c, 'idmap' : None, 'frequency' : f} for c, f in frequency.items()])
 
 def find_exactmatches(conceptId):
     """
