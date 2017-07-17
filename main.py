@@ -29,6 +29,12 @@ import requests
 
 from ontobio.golr.golr_query import GolrSearchQuery
 from ontobio.golr.golr_query import GolrAssociationQuery
+from ontobio.config import session
+
+# Set absolute path of configuration file
+import os
+abspath = os.path.abspath(os.path.dirname(__file__))
+session.default_config_path = abspath + '/conf/config.yaml'
 
 app = Flask(__name__)
 
