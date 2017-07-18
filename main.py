@@ -155,16 +155,21 @@ def get_exactmatches_by_concept_id_list():
 def get_types():
     frequency = {semgroup : 0 for semgroup in semantic_mapping.keys()}
 
-    q = GolrSearchQuery(
+    results = GolrAssociationQuery(
         rows=0,
-        facet_fields=['category']
-    )
-    results = q.exec()
-    facet_counts = results['facet_counts']
-    categories = facet_counts['category']
+        facet_fields=['subject_category', 'object_category']
+    ).exec()
 
-    for key in categories:
-        frequency[monarch_to_UMLS(key)] += categories[key]
+    facet_counts = results['facet_counts']
+
+    subject_category = facet_counts['subject_category']
+    object_category  = facet_counts['object_category']
+
+    for key in subject_category:
+        frequency[monarch_to_UMLS(key)] += subject_category[key]
+
+    for key in object_category:
+        frequency[monarch_to_UMLS(key)] += object_category[key]
 
     return jsonify([{'id' : c, 'idmap' : None, 'frequency' : f} for c, f in frequency.items()])
 
