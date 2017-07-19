@@ -126,12 +126,34 @@ def get_statements():
 @app.route('/evidence/<string:statementId>/')
 @app.route('/evidence/<string:statementId>')
 def get_evidence(statementId):
-    evidence = {}
-    evidence['date'] = '2017-05-10'
-    evidence['id'] = 'https://monarchinitiative.org/'
-    evidence['label'] = 'From the Monarch Initiative'
+    evidences = []
 
-    evidences = [evidence]
+    results = GolrAssociationQuery(id=statementId).exec()
+    associations = results['associations']
+
+    for association in associations:
+        publications = association.get('publications', None)
+        if publications != None:
+            for publication in publications:
+                evidence = {}
+                evidence['id'] = publication.get('id', '')
+                evidence['label'] = publication.get('label', 'PubMed article')
+                evidence['date'] = '0000-0-00'
+
+                evidences.append(evidence)
+
+    # If the statement is found but has no associated publication, give a
+    # generic response for evidence.
+    if len(evidences) == 0 and len(associations) != 0:
+        evidence = {}
+        evidence['id'] = ''
+        evidence['date'] = '0000-00-00'
+        evidence['label'] = 'From the Monarch Initiative - No further supporting text'
+
+        evidences.append(evidence)
+
+    print(evidences)
+
     return jsonify(evidences)
 
 @app.route('/exactmatches/<string:conceptId>/')
