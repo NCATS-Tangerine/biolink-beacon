@@ -54,14 +54,14 @@ def get_concepts():
     pageSize = int(request.args.get('pageSize', 1))
     pageNumber = int(request.args.get('pageNumber', 1))
 
-    if keywords == None or pageSize < 1 or pageNumber < 1:
-        abort(404)
+    validatePagination(pageSize, pageNumber)
+    validateKeywords(keywords)
 
     q = GolrSearchQuery(
         term=keywords,
         category=build_categories(semgroups),
         rows=pageSize,
-        start=pageNumber
+        start=getStartIndex(pageNumber, pageSize)
     )
 
     results = q.exec()
@@ -77,6 +77,8 @@ def get_concepts():
 @app.route('/concepts/<string:conceptId>')
 def get_concept_details(conceptId):
     r = requests.get('https://api.monarchinitiative.org/api/bioentity/' + conceptId + '?rows=1')
+    if r.status_code is not 200:
+        abort(500, 'Monarch request failed. Dumping response: ' + r.text)
     concept = parse_concept(r.json())
     return jsonify([concept])
 
@@ -87,16 +89,17 @@ def get_statements():
     semgroups = request.args.get('semgroups', None)
     pageSize = int(request.args.get('pageSize', 1))
     pageNumber = int(request.args.get('pageNumber', 1))
-    c = request.args.getlist('c')
+    c = getlist('c')
 
-    if c == [] or pageSize < 1 or pageNumber < 1:
-        abort(404)
+    validatePagination(pageNumber, pageSize)
+    validateIdList(c)
 
     q = GolrAssociationQuery(
         subject_or_object_ids=c,
         subject_or_object_category=build_categories(semgroups),
         rows=pageSize,
-        start=pageNumber
+        start=getStartIndex(pageNumber, pageSize),
+        non_null_fields=['relation']
     )
 
     results = q.exec()
@@ -107,67 +110,108 @@ def get_statements():
     for d in results['associations']:
         try:
             statement = {}
+
             statement['id'] = d['id']
-            statement['object'] = {k1 : d['object'].get(k2, None) for k1, k2 in key_pairs.items() }
-            statement['subject'] = {k1 : d['subject'].get(k2, None) for k1, k2 in key_pairs.items() }
-            statement['predicate'] = {k1 : d['relation'].get(k2, None) for k1, k2 in key_pairs.items() }
+            statement['object'] = {k1 : d['object'][k2] for k1, k2 in key_pairs.items() }
+            statement['subject'] = {k1 : d['subject'][k2] for k1, k2 in key_pairs.items() }
+            statement['predicate'] = {k1 : d['relation'][k2] for k1, k2 in key_pairs.items() }
+
+            statements.append(statement)
+
         except:
             pass
-
-        statements.append(statement)
 
     return jsonify(statements)
 
 @app.route('/evidence/<string:statementId>/')
 @app.route('/evidence/<string:statementId>')
 def get_evidence(statementId):
-    evidence = {}
-    evidence['date'] = '2017-05-10'
-    evidence['id'] = 'https://monarchinitiative.org/'
-    evidence['label'] = 'From the Monarch Initiative'
+    evidences = []
 
-    evidences = [evidence]
+    results = GolrAssociationQuery(id=statementId).exec()
+    associations = results['associations']
+
+    for association in associations:
+        publications = association.get('publications', None)
+        if publications != None:
+            for publication in publications:
+                evidence = {}
+                evidence['id'] = publication.get('id', '')
+                evidence['label'] = publication.get('label', 'PubMed article')
+                evidence['date'] = '0000-0-00'
+
+                evidences.append(evidence)
+
+    # If the statement is found but has no associated publication, give a
+    # generic response for evidence.
+    if len(evidences) == 0 and len(associations) != 0:
+        evidence = {}
+        evidence['id'] = ''
+        evidence['date'] = '0000-00-00'
+        evidence['label'] = 'From the Monarch Initiative - No further supporting text'
+
+        evidences.append(evidence)
+
+    print(evidences)
+
     return jsonify(evidences)
 
 @app.route('/exactmatches/<string:conceptId>/')
 @app.route('/exactmatches/<string:conceptId>')
 def get_exactmatches_by_conceptId(conceptId):
-    return jsonify(find_exactmaches(conceptId))
+    return jsonify(find_exactmatches(conceptId))
 
 @app.route('/exactmatches/')
 @app.route('/exactmatches')
 def get_exactmatches_by_concept_id_list():
-    c = request.args.getlist('c')
+    c = getlist('c')
+    validateIdList(c)
 
-    if c == []:
-        abort(404)
-    else:
-        exactmatches = []
-        for conceptId in c:
-            exactmatches.append(find_exactmatches(conceptId))
-        return jsonify(exactmatches)
+    exactmatches = []
+    for conceptId in c:
+        exactmatches += find_exactmatches(conceptId)
+    return jsonify(exactmatches)
 
-def find_exactmaches(conceptId):
+@app.route('/types/')
+@app.route('/types')
+def get_types():
+    frequency = {semgroup : 0 for semgroup in semantic_mapping.keys()}
+
+    results = GolrAssociationQuery(
+        rows=0,
+        facet_fields=['subject_category', 'object_category']
+    ).exec()
+
+    facet_counts = results['facet_counts']
+
+    subject_category = facet_counts['subject_category']
+    object_category  = facet_counts['object_category']
+
+    for key in subject_category:
+        frequency[monarch_to_UMLS(key)] += subject_category[key]
+
+    for key in object_category:
+        frequency[monarch_to_UMLS(key)] += object_category[key]
+
+    return jsonify([{'id' : c, 'idmap' : None, 'frequency' : f} for c, f in frequency.items()])
+
+def find_exactmatches(conceptId):
     """
-    Returns a set of concept ID's that are exact maches for the given conceptId
+    Returns a list of concept ID's that are exact maches for the given conceptId
     """
-    q = GolrSearchQuery(
-        term=conceptId,
-        rows=5
-    )
+    q = GolrSearchQuery(term=conceptId, rows=5)
     results = q.exec()
-
     docs = results['docs']
 
     for d in docs:
         if get_concept_property(d, 'id') == conceptId:
             exactmatches = get_concept_property(d, 'equivalent_curie')
-            return jsonify([]) if exactmatches == None else exactmatches
-    return jsonify([])
+            return exactmatches if exactmatches != None else []
+    return []
 
 def get_concept_property(d, key):
     """
-    Exhausts each affix before returning nothing.
+    Exhausts each affix before returning an empty string.
 
     Parameters
     ----------
@@ -184,7 +228,7 @@ def get_concept_property(d, key):
             try:
                 return d[key + affix]
             except:
-                None
+                pass
     return None
 
 def parse_concept(d):
@@ -218,6 +262,12 @@ def parse_concept(d):
         concept['semanticGroup'] = ' '.join(monarch_to_UMLS(categories))
     else:
         concept['semanticGroup'] = monarch_to_UMLS(concept['semanticGroup'])
+
+    if concept['definition'] is None:
+        concept['definition'] = ""
+
+    if concept['synonyms'] == None:
+        concept['synonyms'] = []
 
     return concept
 
@@ -287,3 +337,36 @@ def monarch_to_UMLS(category):
             if category in value:
                 return key
         return 'OBJC'
+
+def getStartIndex(pageNumber, pageSize):
+    """
+    Monarch begins its indexing at zero, and start refers to the index of
+    the data rather than the page number. This method calculates the start index
+    from the pageNumber and pageSize
+    """
+    return (pageNumber - 1) * pageSize
+
+def getlist(param_name):
+    """
+    Flask only handles lists like /statements?c=ABC&c=DEF&c=GHI
+    But at the moment TKBio is formatting lists like /statements?c=ABC,DEF,GHI
+    """
+    l = request.args.getlist(param_name)
+    c = []
+    for item in l:
+        c += item.split(',')
+    return [item.strip() for item in c]
+
+def validatePagination(pageSize, pageNumber):
+    if pageSize < 1:
+        abort(500, 'pageSize must be greater than zero')
+    if pageNumber < 1:
+        abort(500, 'pageNumber must be greater than zero')
+
+def validateKeywords(keywords):
+    if keywords is None:
+        abort(500, 'keywords must not be empty')
+
+def validateIdList(c):
+    if c is []:
+        abort(500, 'list c must not be empty')
