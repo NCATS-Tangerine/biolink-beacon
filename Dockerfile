@@ -1,4 +1,4 @@
-FROM ubuntu:14.04
+FROM ubuntu:16.04
 
 RUN apt-get -y update
 # It complains if apt-utils is not installed
