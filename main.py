@@ -76,11 +76,30 @@ def get_concepts():
 @app.route('/concepts/<string:conceptId>/')
 @app.route('/concepts/<string:conceptId>')
 def get_concept_details(conceptId):
-    r = requests.get('https://api.monarchinitiative.org/api/bioentity/' + conceptId + '?rows=1')
-    if r.status_code is not 200:
-        abort(500, 'Monarch request failed. Dumping response: ' + r.text)
-    concept = parse_concept(r.json())
-    return jsonify([concept])
+    results = GolrSearchQuery(
+        term=conceptId,
+        fq={'id' : conceptId},
+        rows=1,
+        hl=False
+    ).exec()
+
+    for d in results['docs']:
+        c = parse_concept(d)
+
+        details = {}
+        details['iri'] = get_concept_property(d, 'iri')
+        details['taxon'] = get_concept_property(d, 'taxon')
+        details['taxon_label'] = get_concept_property(d, 'taxon_label')
+        details['taxon_label_synonym'] = get_concept_property(d, 'taxon_label_synonym')
+
+        if details['taxon_label_synonym'] is not None:
+            details['taxon_label_synonym'] = ', '.join(details['taxon_label_synonym'])
+
+        c['details'] = [{'tag' : k, 'value' : v} for k, v in details.items() if v is not None]
+
+        return jsonify(c)
+
+    return jsonify()
 
 @app.route('/statements/')
 @app.route('/statements')
@@ -199,13 +218,19 @@ def find_exactmatches(conceptId):
     """
     Returns a list of concept ID's that are exact maches for the given conceptId
     """
-    q = GolrSearchQuery(term=conceptId, rows=5)
-    results = q.exec()
+    results = GolrSearchQuery(
+        term=conceptId,
+        fq={'id' : conceptId},
+        rows=1,
+        hl=False
+    ).exec()
+
     docs = results['docs']
 
     for d in docs:
         if get_concept_property(d, 'id') == conceptId:
             exactmatches = get_concept_property(d, 'equivalent_curie')
+            exactmatches.append(conceptId)
             return exactmatches if exactmatches != None else []
     return []
 
