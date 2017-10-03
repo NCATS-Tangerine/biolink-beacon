@@ -83,7 +83,7 @@ def get_concept_details(conceptId):
         hl=False
     ).exec()
 
-    results = []
+    entries = []
     for d in results['docs']:
         
         c = parse_concept(d)
@@ -99,9 +99,9 @@ def get_concept_details(conceptId):
 
         c['details'] = [{'tag' : k, 'value' : v} for k, v in details.items() if v is not None]
 
-        results += [c]
+        entries += [c]
 
-    return jsonify(results)
+    return jsonify(entries)
 
 @app.route('/statements/')
 @app.route('/statements')
