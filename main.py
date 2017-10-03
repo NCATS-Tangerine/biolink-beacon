@@ -232,6 +232,8 @@ def find_exactmatches(conceptId):
     for d in docs:
         if get_concept_property(d, 'id') == conceptId:
             exactmatches = get_concept_property(d, 'equivalent_curie')
+            if exactmatches == None:
+                exactmatches = [] # just in case this property is empty
             exactmatches.append(conceptId)
             return exactmatches if exactmatches != None else []
     return []
