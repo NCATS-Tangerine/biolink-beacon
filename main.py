@@ -80,7 +80,7 @@ def get_concept_details(conceptId):
     if r.status_code is not 200:
         abort(500, 'Monarch request failed. Dumping response: ' + r.text)
     concept = parse_concept(r.json())
-    return jsonify([concept])
+    return jsonify(concept,)
 
 @app.route('/statements/')
 @app.route('/statements')

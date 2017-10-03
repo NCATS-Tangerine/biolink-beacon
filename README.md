@@ -4,12 +4,8 @@ Monarch Biolink Knowledge Beacon implementation (as a Python Flask application).
 
 ## Quickstart (Using Docker) ##
 
-At the moment Docker is only available to Linux users. Docker can be installed through a shell script available online.
+This project is designed to run as a Docker container. Note that although the Docker client used to manage containers runs on several operating systems, the container engine currently only runs under Linux. See the [Docker Guide] (https://docs.docker.com/get-started/) for details on how to install Docker.
 
-```shell
-wget https://get.docker.com -O install.sh
-sh install.sh
-```
 Then with Docker installed, you can build an image from the `Dockerfile` provided in the main directory of this project.
 
 ```shell
