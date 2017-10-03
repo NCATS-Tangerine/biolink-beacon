@@ -13,10 +13,10 @@ cd biolink-beacon
 docker build -t ncats:biolink .
 ```
 
-Within the Docker container, the Flask app is set to run at `0.0.0.0:5000`. You can re-map ports when you run a Docker image with the `-p` flag.
+Note that depending on your Docker installation, you may need to run the docker command as 'sudo'.  Within the Docker container, the Flask app is set to run at `0.0.0.0:5000`. You can re-map ports when you run a Docker image with the `-p` flag.
 
 ```shell
-docker run -p 8080:5000 ncats:biolink
+docker run --rm -p 8080:5000 ncats:biolink
 ```
 
 Now open your browser to `localhost:8080` to see the application running.
