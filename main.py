@@ -132,7 +132,7 @@ def get_statements():
         try:
             statement = {}
 
-            statement['id'] = d['id']
+            statement['id'] = 'biolink:' + d['id'] # add the biolink: prefix to statement id's
             statement['object'] = {k1 : d['object'][k2] for k1, k2 in key_pairs.items() }
             statement['subject'] = {k1 : d['subject'][k2] for k1, k2 in key_pairs.items() }
             statement['predicate'] = {k1 : d['relation'][k2] for k1, k2 in key_pairs.items() }
@@ -147,6 +147,10 @@ def get_statements():
 @app.route('/evidence/<string:statementId>/')
 @app.route('/evidence/<string:statementId>')
 def get_evidence(statementId):
+    
+    if statementId.startswith('biolink:'):
+        statementId = statementId[8:]
+        
     evidences = []
 
     results = GolrAssociationQuery(id=statementId).exec()
