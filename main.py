@@ -120,7 +120,7 @@ def get_statements():
     q = GolrAssociationQuery(
         subject_or_object_ids=c,
         subject_or_object_category=build_categories(semanticGroups),
-        relation=get_relation(relations), # Currently only first relation in the list, if any, is taken?
+        #relation=get_relation(relations), # Currently only first relation in the list, if any, is taken?
         rows=pageSize,
         start=getStartIndex(pageNumber, pageSize),
         non_null_fields=['relation']
@@ -138,10 +138,10 @@ def get_statements():
             statement['id'] = 'biolink:' + d['id'] # add the biolink: prefix to statement id's
             
             statement['object'] = {k1 : d['object'][k2] for k1, k2 in key_pairs.items() }
-            statement['object']['semanticGroup'] = monarch_to_UMLS(statement['object']['semanticGroup'])
+            #statement['object']['semanticGroup'] = monarch_to_UMLS(statement['object']['semanticGroup'])
             
             statement['subject'] = {k1 : d['subject'][k2] for k1, k2 in key_pairs.items() }
-            statement['subject']['semanticGroup'] = monarch_to_UMLS(statement['subject']['semanticGroup'])
+            #statement['subject']['semanticGroup'] = monarch_to_UMLS(statement['subject']['semanticGroup'])
             
             statement['predicate'] = {k1 : d['relation'][k2] for k1, k2 in key_pairs.items() }
 
