@@ -50,7 +50,7 @@ def hello_world():
 @app.route('/concepts')
 def get_concepts():
     keywords = request.args.get('keywords', None)
-    semgroups = request.args.get('semgroups', None)
+    semanticGroups = request.args.get('semanticGroups', None)
     pageSize = int(request.args.get('pageSize', 1))
     pageNumber = int(request.args.get('pageNumber', 1))
 
@@ -59,7 +59,7 @@ def get_concepts():
 
     q = GolrSearchQuery(
         term=keywords,
-        category=build_categories(semgroups),
+        category=build_categories(semanticGroups),
         rows=pageSize,
         start=getStartIndex(pageNumber, pageSize)
     )
@@ -76,6 +76,7 @@ def get_concepts():
 @app.route('/concepts/<string:conceptId>/')
 @app.route('/concepts/<string:conceptId>')
 def get_concept_details(conceptId):
+    
     results = GolrSearchQuery(
         term=conceptId,
         fq={'id' : conceptId},
@@ -107,7 +108,8 @@ def get_concept_details(conceptId):
 @app.route('/statements')
 def get_statements():
     keywords = request.args.get('keywords', None)
-    semgroups = request.args.get('semgroups', None)
+    semanticGroups = request.args.get('semanticGroups', None)
+    relations = request.args.get('relations', None)
     pageSize = int(request.args.get('pageSize', 1))
     pageNumber = int(request.args.get('pageNumber', 1))
     c = getlist('c')
@@ -115,9 +117,10 @@ def get_statements():
     validatePagination(pageNumber, pageSize)
     validateIdList(c)
 
-    q = GolrAssociationQuery(
+    q = (GolrAssociationQuery
         subject_or_object_ids=c,
-        subject_or_object_category=build_categories(semgroups),
+        subject_or_object_category=build_categories(semanticGroups),
+        relation=get_relation(relations), # Currently only first relation in the list, if any, is taken?
         rows=pageSize,
         start=getStartIndex(pageNumber, pageSize),
         non_null_fields=['relation']
@@ -125,7 +128,7 @@ def get_statements():
 
     results = q.exec()
 
-    key_pairs = { 'id' : 'id', 'name' : 'label' }
+    key_pairs = { 'id' : 'id', 'name' : 'label', 'semanticGroup' : "category" }
 
     statements = []
     for d in results['associations']:
@@ -133,8 +136,13 @@ def get_statements():
             statement = {}
 
             statement['id'] = 'biolink:' + d['id'] # add the biolink: prefix to statement id's
+            
             statement['object'] = {k1 : d['object'][k2] for k1, k2 in key_pairs.items() }
+            statement['object']['semanticGroup'] = monarch_to_UMLS(statement['object']['semanticGroup'])
+            
             statement['subject'] = {k1 : d['subject'][k2] for k1, k2 in key_pairs.items() }
+            statement['subject']['semanticGroup'] = monarch_to_UMLS(statement['subject']['semanticGroup'])
+            
             statement['predicate'] = {k1 : d['relation'][k2] for k1, k2 in key_pairs.items() }
 
             statements.append(statement)
@@ -200,7 +208,8 @@ def get_exactmatches_by_concept_id_list():
 @app.route('/types/')
 @app.route('/types')
 def get_types():
-    frequency = {semgroup : 0 for semgroup in semantic_mapping.keys()}
+    
+    frequency = {semanticGroup : 0 for semanticGroup in semantic_mapping.keys()}
 
     results = GolrAssociationQuery(
         rows=0,
@@ -220,9 +229,29 @@ def get_types():
 
     return jsonify([{'id' : c, 'idmap' : None, 'frequency' : f} for c, f in frequency.items()])
 
+@app.route('/predicates/')
+@app.route('/predicates')
+def get_predicates():
+    
+    """
+    I'm not quite sure how to best get at all the predicates and tag them as relations with id's
+    """
+    frequency = {semanticGroup : 0 for semanticGroup in semantic_mapping.keys()}
+
+    results = GolrAssociationQuery(
+        rows=0,
+        facet_fields=['relation']
+    ).exec()
+
+    facet_counts = results['facet_counts']
+
+    relations = facet_counts['relation']
+
+    return jsonify([{'id' : "biolink:"+c, 'name' : c, 'definition' : None} for key in relations])
+
 def find_exactmatches(conceptId):
     """
-    Returns a list of concept ID's that are exact maches for the given conceptId
+    Returns a list of concept ID's that are exact matches for the given conceptId
     """
     results = GolrSearchQuery(
         term=conceptId,
@@ -304,22 +333,22 @@ def parse_concept(d):
 
     return concept
 
-def build_categories(semgroups):
+def build_categories(semanticGroups):
     """
     Returns a list of ontobio categories or None
 
     Parameters
     ----------
-    semgroups : string
-        a space deliminated collection of semgroups
+    semanticGroups : string
+        a space delimited collection of semanticGroups
     """
-    if semgroups is None:
+    if semanticGroups is None:
         return None
 
     categories = []
-    for semgroup in semgroups.split(' '):
+    for semanticGroup in semanticGroups.split(' '):
         try:
-            categories += UMLS_to_monarch(semgroup.upper())
+            categories += UMLS_to_monarch(semanticGroup.upper())
         except:
             None
 
@@ -327,6 +356,32 @@ def build_categories(semgroups):
         return None
     else:
         return categories
+
+def get_relation(relations):
+    """
+    Returns first entry in the list of relations or None
+
+    Parameters
+    ----------
+    relations : string
+        a space delimited collection of relation id's... but I only teke the first one? 
+    """
+    if relations is None:
+        return None
+
+    relation = None
+    for relationId in relations.split(' '):
+        try:
+            ridPart = relationId.split(":")
+            relation = ridPart[1]
+            break # only first relation taken for now?
+        except:
+            None
+
+    if relation == None:
+        return None
+    else:
+        return relation
 
 # TODO: Make sure that this mapping makes sense!
 # https://github.com/monarch-initiative/SciGraph-docker-monarch-data/blob/master/src/main/resources/monarchLoadConfiguration.yaml.tmpl#L74-L113
@@ -350,15 +405,15 @@ semantic_mapping = {
     'ORGA' : ['']
 }
 
-def UMLS_to_monarch(semgroup):
-    if semgroup is None: return None
+def UMLS_to_monarch(semanticGroup):
+    if semanticGroup is None: return None
 
-    if isinstance(semgroup, (list, set)):
-        return list({ UMLS_to_monarch(c) for c in semgroup })
+    if isinstance(semanticGroup, (list, set)):
+        return list({ UMLS_to_monarch(c) for c in semanticGroup })
     else:
         # None translates to any semantic category, an empty string translates
         # to no semantic category.
-        return semantic_mapping.get(semgroup.upper(), '')
+        return semantic_mapping.get(semanticGroup.upper(), '')
 
 def monarch_to_UMLS(category):
     if category is None: return 'OBJC'
