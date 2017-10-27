@@ -117,7 +117,7 @@ def get_statements():
     validatePagination(pageNumber, pageSize)
     validateIdList(c)
 
-    q = (GolrAssociationQuery
+    q = GolrAssociationQuery(
         subject_or_object_ids=c,
         subject_or_object_category=build_categories(semanticGroups),
         relation=get_relation(relations), # Currently only first relation in the list, if any, is taken?
