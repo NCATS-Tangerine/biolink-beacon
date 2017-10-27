@@ -144,7 +144,7 @@ def get_statements():
     q = GolrAssociationQuery(
         subject_or_object_ids=c,
         subject_or_object_category=build_categories(semanticGroups),
-        #relation=get_relation(relations), # Currently only first relation in the list, if any, is taken?
+        relation=get_relation(relations), # Currently only first relation in the list, if any, is taken?
         rows=pageSize,
         start=getStartIndex(pageNumber, pageSize),
         non_null_fields=['relation']
@@ -152,7 +152,7 @@ def get_statements():
 
     results = q.exec()
     
-    #print("statement results: "+str(len(results['associations']))+" items found?")
+    print("statement results: "+str(len(results['associations']))+" items found?")
 
     key_pairs = { 'id' : 'id', 'name' : 'label' }
 
@@ -262,8 +262,8 @@ def get_predicates():
     """
     I'm not quite sure how to best get at all the predicates and tag them as relations with id's
     """
-    frequency = {semanticGroup : 0 for semanticGroup in semantic_mapping.keys()}
-
+    
+    """
     results = GolrAssociationQuery(
         rows=0,
         facet_fields=['relation']
@@ -274,6 +274,9 @@ def get_predicates():
     relations = facet_counts['relation']
 
     return jsonify([{'id' : "biolink:"+c, 'name' : c, 'definition' : None} for key in relations])
+    """
+    # Not yet implemented... don't really know how
+    return jsonify([]})
 
 def find_exactmatches(conceptId):
     """
