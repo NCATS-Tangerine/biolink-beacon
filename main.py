@@ -77,6 +77,9 @@ def get_concepts():
 @app.route('/concepts/<string:conceptId>')
 def get_concept_details(conceptId):
     
+    if(conceptId.startswith("biolink"))
+        conceptId = objectId(conceptId)
+    
     results = GolrSearchQuery(
         term=conceptId,
         fq={'id' : conceptId},
@@ -104,6 +107,27 @@ def get_concept_details(conceptId):
 
     return jsonify(entries)
 
+def get_concept(conceptId):
+    
+    if(conceptId.startswith("biolink"))
+        conceptId = objectId(conceptId)
+    
+    results = GolrSearchQuery(
+        term=conceptId,
+        fq={'id' : conceptId},
+        rows=1,
+        hl=False
+    ).exec() 
+    
+    c = None    
+    entries = []
+    for d in results['docs']:
+        
+        c = parse_concept(d)
+        break
+    
+    return c
+
 @app.route('/statements/')
 @app.route('/statements')
 def get_statements():
@@ -128,9 +152,9 @@ def get_statements():
 
     results = q.exec()
     
-    print("statement results: "+str(len(results['associations']))+" items found?")
+    #print("statement results: "+str(len(results['associations']))+" items found?")
 
-    key_pairs = { 'id' : 'id', 'name' : 'label', 'semanticGroup' : "category" }
+    key_pairs = { 'id' : 'id', 'name' : 'label' }
 
     statements = []
     for d in results['associations']:
@@ -140,10 +164,10 @@ def get_statements():
             statement['id'] = 'biolink:' + d['id'] # add the biolink: prefix to statement id's
             
             statement['object'] = {k1 : d['object'][k2] for k1, k2 in key_pairs.items() }
-            #statement['object']['semanticGroup'] = monarch_to_UMLS(statement['object']['semanticGroup'])
+            statement['object'] = get_concept(statement['object']['id'])
             
             statement['subject'] = {k1 : d['subject'][k2] for k1, k2 in key_pairs.items() }
-            #statement['subject']['semanticGroup'] = monarch_to_UMLS(statement['subject']['semanticGroup'])
+            statement['subject'] = get_concept(statement['subject']['id'])
             
             statement['predicate'] = {k1 : d['relation'][k2] for k1, k2 in key_pairs.items() }
 
@@ -374,8 +398,7 @@ def get_relation(relations):
     relation = None
     for relationId in relations.split(' '):
         try:
-            ridPart = relationId.split(":")
-            relation = ridPart[1]
+            relation = objectId(relationId)
             break # only first relation taken for now?
         except:
             None
@@ -384,6 +407,11 @@ def get_relation(relations):
         return None
     else:
         return relation
+
+def objectId(id):
+    idPart = id.split(":")
+    id = idPart[1]
+    return id
 
 # TODO: Make sure that this mapping makes sense!
 # https://github.com/monarch-initiative/SciGraph-docker-monarch-data/blob/master/src/main/resources/monarchLoadConfiguration.yaml.tmpl#L74-L113
