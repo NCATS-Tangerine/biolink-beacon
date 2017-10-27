@@ -276,7 +276,7 @@ def get_predicates():
     return jsonify([{'id' : "biolink:"+c, 'name' : c, 'definition' : None} for key in relations])
     """
     # Not yet implemented... don't really know how
-    return jsonify([]})
+    return jsonify([])
 
 def find_exactmatches(conceptId):
     """
