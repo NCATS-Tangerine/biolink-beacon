@@ -109,7 +109,7 @@ def get_concept_details(conceptId):
 
 def get_concept(conceptId):
     
-    if(conceptId.startswith("biolink"))
+    if conceptId.startswith("biolink"):
         conceptId = objectId(conceptId)
     
     results = GolrSearchQuery(
