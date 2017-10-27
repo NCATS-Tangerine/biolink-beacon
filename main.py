@@ -127,11 +127,14 @@ def get_statements():
     )
 
     results = q.exec()
+    
+    print("statement results:\n:"+results)
 
     key_pairs = { 'id' : 'id', 'name' : 'label', 'semanticGroup' : "category" }
 
     statements = []
     for d in results['associations']:
+        print("association:\n"+d)
         try:
             statement = {}
 
