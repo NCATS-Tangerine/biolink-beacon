@@ -128,7 +128,7 @@ def get_statements():
 
     results = q.exec()
     
-    print("statement results: "+len(results['associations'])+" items found?")
+    print("statement results: "+str(len(results['associations']))+" items found?")
 
     key_pairs = { 'id' : 'id', 'name' : 'label', 'semanticGroup' : "category" }
 
