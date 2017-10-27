@@ -77,7 +77,7 @@ def get_concepts():
 @app.route('/concepts/<string:conceptId>')
 def get_concept_details(conceptId):
     
-    if(conceptId.startswith("biolink"))
+    if conceptId.startswith("biolink"):
         conceptId = objectId(conceptId)
     
     results = GolrSearchQuery(
