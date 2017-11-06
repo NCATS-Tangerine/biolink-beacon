@@ -1,19 +1,17 @@
 swagger: '2.0'
 info:
   title: Translator Knowledge Beacon API
-  version: 1.0.14
+  version: 1.0.15
   contact:
     url: 'http://starinformatics.com'
     email: richard@starinformatics.com
-    responsibleDeveloper: Richard Bruskiewich
-    responsibleOrganization: STAR Informatics/Delphinai Corporation
   description: >
-    This is the Translator Knowledge Beacon web service application
-    programming interface (API) wrapping the Monarch Biolink API.
+    This is the Translator Knowledge Beacon web service application programming
+    interface (API) wrapping the BioLink API from Monarch.
   license:
     name: MIT License
     url: 'http://opensource.org/licenses/MIT'
-host: biolink-kb.ncats.io
+host: reference-beacon.ncats.io
 basePath: /
 schemes:
   - https
@@ -48,7 +46,7 @@ paths:
           schema:
             type: array
             items:
-              title: Summary
+              title: BeaconSummary
               type: object
               properties:
                 id:
@@ -92,7 +90,7 @@ paths:
           schema:
             type: array
             items:
-              title: ConceptWithDetails
+              title: BeaconConceptWithDetails
               type: object
               properties:
                 id:
@@ -121,7 +119,7 @@ paths:
                 details:
                   type: array
                   items:
-                    title: ConceptDetail
+                    title: BeaconConceptDetail
                     type: object
                     properties:
                       tag:
@@ -161,9 +159,9 @@ paths:
           description: >
             a (url-encoded) space-delimited set of semantic groups (specified as
             codes CHEM, GENE, ANAT, etc.) to which to constrain concepts matched
-            by the main keyword search (see
-            [Semantic Groups](https://metamap.nlm.nih.gov/Docs/SemGroups_2013.txt) for
-            the full list of codes)
+            by the main keyword search (see [Semantic
+            Groups](https://metamap.nlm.nih.gov/Docs/SemGroups_2013.txt) for the
+            full list of codes)
           required: false
           type: string
         - name: pageNumber
@@ -186,7 +184,7 @@ paths:
           schema:
             type: array
             items:
-              title: Concept
+              title: BeaconConcept
               type: object
               properties:
                 id:
@@ -305,7 +303,7 @@ paths:
           schema:
             type: array
             items:
-              title: Predicate
+              title: BeaconPredicate
               type: object
               properties:
                 id:
@@ -373,11 +371,12 @@ paths:
         of known exactly matched concepts
         [*sensa*-SKOS](http://www.w3.org/2004/02/skos/core#exactMatch),
         retrieves the list of [CURIE](https://www.w3.org/TR/curie/) identifiers
-        of additional concepts that are deemed by the given knowledge source
-        to be exact matches to one or more of the input concepts **plus** whichever
-        identifiers from the input list which specifically matched these new additional
-        concepts.  If an empty set is returned, the it can be assumed that the given 
-        knowledge source does not know of any new equivalent concepts matching the input set.
+        of additional concepts that are deemed by the given knowledge source to
+        be exact matches to one or more of the input concepts **plus** whichever
+        identifiers from the input list which specifically matched these new
+        additional concepts.  If an empty set is returned, the it can be assumed
+        that the given  knowledge source does not know of any new equivalent
+        concepts matching the input set.
       tags:
         - exactmatches
       parameters:
@@ -420,37 +419,49 @@ paths:
   /statements:
     get:
       description: >
-        Given a list of [CURIE-encoded](https://www.w3.org/TR/curie/)
-        identifiers of exactly matching concepts, retrieves a paged list of
-        concept-relations where either the subject or object concept matches at
-        least one concept in the input list
+        Given a specified set of [CURIE-encoded](https://www.w3.org/TR/curie/) 
+        'source' ('s') concept identifiers,  retrieves a paged list of
+        relationship statements where either the subject or object concept
+        matches any of the input 'source' concepts provided.  Optionally, a set
+        of 'target' ('t') concept  identifiers may also be given, in which case
+        a member of the 'target' identifier set should match the concept
+        opposing the 'source' in the  statement, that is, if the'source' matches
+        a subject, then the  'target' should match the object of a given
+        statement (or vice versa).
       tags:
         - statements
       parameters:
-        - name: c
+        - name: s
           in: query
           description: >
-            set of [CURIE-encoded](https://www.w3.org/TR/curie/) identifiers of
-            exactly matching concepts to be used in a search for associated
-            concept-relation statements
+            a set of [CURIE-encoded](https://www.w3.org/TR/curie/) identifiers
+            of  'source' concepts possibly known to the beacon. Unknown CURIES
+            should simply be ignored (silent match failure).
           required: true
           type: array
           items:
             type: string
-        - name: pageNumber
+        - name: relations
           in: query
-          description: |
-            (1-based) number of the page to be returned in a paged set of query
-            results
+          description: >
+            a (url-encoded, space-delimited) string of predicate relation
+            identifiers with which to constrain the statement relations
+            retrieved  for the given query seed concept. The predicate ids sent
+            should  be as published by the beacon-aggregator by the /predicates
+            API endpoint.
           required: false
-          type: integer
-        - name: pageSize
+          type: string
+        - name: t
           in: query
-          description: |
-            number of concepts per page to be returned in a paged set of query
-            results
+          description: >
+            (optional) an array set of
+            [CURIE-encoded](https://www.w3.org/TR/curie/)  identifiers of
+            'target' concepts possibly known to the beacon.  Unknown CURIEs
+            should simply be ignored (silent match failure).
           required: false
-          type: integer
+          type: array
+          items:
+            type: string
         - name: keywords
           in: query
           description: >
@@ -466,21 +477,25 @@ paths:
             a (url-encoded, space-delimited) string of semantic groups
             (specified as codes CHEM, GENE, ANAT, etc.) to which to constrain
             the subject or object concepts associated with the query seed
-            concept (see
-            [Semantic Groups](https://metamap.nlm.nih.gov/Docs/SemGroups_2013.txt) for
-            the full list of codes)
+            concept (see [Semantic
+            Groups](https://metamap.nlm.nih.gov/Docs/SemGroups_2013.txt) for the
+            full list of codes)
           required: false
           type: string
-        - name: relations
+        - name: pageNumber
           in: query
-          description: >
-            a (url-encoded, space-delimited) string of predicate relation
-            identifiers with which to constrain the statement relations
-            retrieved  for the given query seed concept. The predicate ids sent
-            should  be as published by the beacon-aggregator by the /predicates
-            API endpoint.
+          description: |
+            (1-based) number of the page to be returned in a paged set of query
+            results
           required: false
-          type: string
+          type: integer
+        - name: pageSize
+          in: query
+          description: |
+            number of concepts per page to be returned in a paged set of query
+            results
+          required: false
+          type: integer
       operationId: getStatements
       responses:
         '200':
@@ -491,7 +506,7 @@ paths:
           schema:
             type: array
             items:
-              title: Statement
+              title: BeaconStatement
               type: object
               properties:
                 id:
@@ -500,7 +515,7 @@ paths:
                     CURIE-encoded identifier for statement (can be used to
                     retrieve associated evidence)
                 subject:
-                  title: StatementSubject
+                  title: BeaconStatementSubject
                   type: object
                   properties:
                     id:
@@ -514,11 +529,11 @@ paths:
                       type: string
                       description: >
                         a semantic group for the subject concept (specified as a
-                        code CHEM, GENE, etc. - see
-                        [Semantic Groups](https://metamap.nlm.nih.gov/Docs/SemGroups_2013.txt)
+                        code CHEM, GENE, etc. - see [Semantic
+                        Groups](https://metamap.nlm.nih.gov/Docs/SemGroups_2013.txt)
                         for the full list of codes)
                 predicate:
-                  title: StatementPredicate
+                  title: BeaconStatementPredicate
                   type: object
                   properties:
                     id:
@@ -529,7 +544,7 @@ paths:
                       type: string
                       description: human readable label of concept
                 object:
-                  title: StatementObject
+                  title: BeaconStatementObject
                   type: object
                   properties:
                     id:
@@ -543,8 +558,8 @@ paths:
                       type: string
                       description: >
                         a semantic group for the object concept (specified as a
-                        code CHEM, GENE, etc. - see
-                        [Semantic Groups](https://metamap.nlm.nih.gov/Docs/SemGroups_2013.txt)
+                        code CHEM, GENE, etc. - see [Semantic
+                        Groups](https://metamap.nlm.nih.gov/Docs/SemGroups_2013.txt)
                         for the full list of codes)
           examples:
             application/json:
@@ -608,7 +623,7 @@ paths:
           schema:
             type: array
             items:
-              title: Annotation
+              title: BeaconAnnotation
               type: object
               properties:
                 id:

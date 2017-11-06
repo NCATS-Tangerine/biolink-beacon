@@ -131,28 +131,49 @@ def get_concept(conceptId):
 @app.route('/statements/')
 @app.route('/statements')
 def get_statements():
+    s = getlist('s')
+    relations = request.args.get('relations', None)
+    t = getlist('t')
     keywords = request.args.get('keywords', None)
     semanticGroups = request.args.get('semanticGroups', None)
-    relations = request.args.get('relations', None)
     pageSize = int(request.args.get('pageSize', 1))
     pageNumber = int(request.args.get('pageNumber', 1))
-    c = getlist('c')
 
     validatePagination(pageNumber, pageSize)
-    validateIdList(c)
+    validateIdList(s)
+    
+    if t == None or len(t) == 0: t = None
 
-    q = GolrAssociationQuery(
-        subject_or_object_ids=c,
-        subject_or_object_category=build_categories(semanticGroups),
+    # query 'source' set as subject
+    qSub = GolrAssociationQuery(
+        subjects=s,
+        objects=t,
+        object_category=build_categories(semanticGroups),
         relation=get_relation(relations), # Currently only first relation in the list, if any, is taken?
         rows=pageSize,
         start=getStartIndex(pageNumber, pageSize),
-        non_null_fields=['relation']
+        non_null_fields=['subject','relation','object']
     )
 
-    results = q.exec()
+    subStmts = qSub.exec()
     
-    print("statement results: "+str(len(results['associations']))+" items found?")
+    # query 'source' set as subject
+    qObj = GolrAssociationQuery(
+        objects=s,
+        subjects=t,
+        subject_category=build_categories(semanticGroups),
+        relation=get_relation(relations), # Currently only first relation in the list, if any, is taken?
+        rows=pageSize,
+        start=getStartIndex(pageNumber, pageSize),
+        non_null_fields=['subject','relation','object']
+    )
+
+    objStmts = qObj.exec()
+    
+    # Merge two dictionaries
+    results = { **subStmts, **objStmts } 
+    
+    print("statement results: "+str(len(results))+" items found?")
 
     key_pairs = { 'id' : 'id', 'name' : 'label' }
 
