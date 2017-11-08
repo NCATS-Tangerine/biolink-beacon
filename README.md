@@ -45,7 +45,7 @@ By default it runs at [http://127.0.0.1:5000/](http://127.0.0.1:5000/). You can 
 $ flask run -h 0.0.0.0 -p 8080
 ```
 
-Make sure you are using the latest version of python. It is recommended that you install and use this project from within a [virtual environment](http://python-guide-pt-br.readthedocs.io/en/latest/dev/virtualenvs/).
+Make sure you are using the latest version of python. It is recommended that you install and use this project from within a [virtual environment](https://virtualenv.pypa.io/en/latest/).
 
 ## Issues ##
 - I have made assumptions about how Monarch's semantic categories should be mapped onto the UMLS semantic types that TKBio uses. These assumptions may not be correct, and should be reviewed by the user.
