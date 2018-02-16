@@ -4,6 +4,7 @@ import six
 from swagger_server.models.summary import Summary  # noqa: E501
 from swagger_server import util
 
+import controller_impl.summary_controller_impl as impl
 
 def linked_types():  # noqa: E501
     """linked_types
@@ -13,4 +14,4 @@ def linked_types():  # noqa: E501
 
     :rtype: List[Summary]
     """
-    return 'do some magic!'
+    return impl.linked_types()

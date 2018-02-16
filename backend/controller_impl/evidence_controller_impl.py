@@ -1,10 +1,9 @@
-import connexion
-import six
+import requests
 
 from swagger_server.models.annotation import Annotation  # noqa: E501
-from swagger_server import util
 
-import controller_impl.evidence_controller_impl as impl
+from controller_impl import utils
+
 
 def get_evidence(statementId, keywords=None, pageNumber=None, pageSize=None):  # noqa: E501
     """get_evidence
@@ -22,4 +21,24 @@ def get_evidence(statementId, keywords=None, pageNumber=None, pageSize=None):  #
 
     :rtype: List[Annotation]
     """
-    return impl.get_evidence(statementId, keywords, pageNumber, pageSize)
+    pageNumber = utils.sanitize_int(pageNumber)
+    pageSize = utils.sanitize_int(pageSize, default_value=5)
+
+    path = utils.base_path() + 'association/' + statementId
+    params = {'page' : pageNumber - 1, 'rows' : pageSize}
+
+    json_response = requests.get(path, params).json()
+
+    publications = json_response['publications']
+
+    annotations = []
+
+    if publications != None and publications != []:
+        for publication in publications:
+            annotation = Annotation(
+                id=publication.get('id', ''),
+                label=publication.get('label', 'unspecified PubMed article')
+            )
+            annotations.append(annotation)
+
+    return annotations

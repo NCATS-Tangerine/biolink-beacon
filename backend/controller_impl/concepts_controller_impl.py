@@ -1,10 +1,10 @@
-import connexion
-import six
+import requests
 
 from swagger_server.models.concept import Concept  # noqa: E501
 from swagger_server.models.concept_with_details import ConceptWithDetails  # noqa: E501
-from swagger_server import util
+from swagger_server.models.concept_detail import ConceptDetail
 
+from controller_impl import utils
 
 def get_concept_details(conceptId):  # noqa: E501
     """get_concept_details
@@ -16,7 +16,19 @@ def get_concept_details(conceptId):  # noqa: E501
 
     :rtype: List[ConceptWithDetails]
     """
-    return 'do some magic!'
+
+    json_response = requests.get(
+        utils.base_path() + 'bioentity/' + conceptId
+    ).json()
+
+    concept = ConceptWithDetails(
+        id=json_response.get('id', None),
+        name=json_response.get('label', None),
+        semantic_group=' '.join(json_response.get('categories', [])),
+        synonyms=[s['val'] for s in json_response.get('synonyms', []) if 'val' in s]
+    )
+
+    return [concept]
 
 
 def get_concepts(keywords, semanticGroups=None, pageNumber=None, pageSize=None):  # noqa: E501
@@ -36,15 +48,30 @@ def get_concepts(keywords, semanticGroups=None, pageNumber=None, pageSize=None):
     :rtype: List[Concept]
     """
 
-    pageNumber = 1 if pageNumber == None or pageNumber < 1 else pageNumber
-    pageSize = 5 if pageSize == None or pageSize < 1 else pageSize
+    json_response = requests.get(
+        utils.base_path() + 'search/entity/' + keywords,
+        params={
+            'rows': pageSize,
+            'start': pageNumber,
+            'category': semanticGroups.split(' ') if semanticGroups is not None else None
+        }
+    ).json()
 
-    concept = Concept(
-        id='biolink:123',
-        name='Biolink concepts relating to: ' + keywords,
-        semantic_group='GENE',
-        synonyms=[],
-        definition='no definition available'
-    )
+    concepts = []
 
-    return [concept for i in range(pageSize)]
+    for d in json_response['docs']:
+        name = utils.sanitize_str(utils.get_property(d, 'id'))
+        semantic_group = utils.sanitize_str(utils.get_property(d, 'category'))
+        definition = utils.sanitize_str(utils.get_property(d, 'definition'))
+
+        concept = Concept(
+            id=utils.get_property(d, 'id'),
+            name=name,
+            semantic_group=semantic_group,
+            synonyms=utils.get_property(d, 'synonym', []),
+            definition=definition
+        )
+
+        concepts.append(concept)
+
+    return concepts

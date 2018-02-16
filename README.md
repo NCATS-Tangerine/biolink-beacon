@@ -9,10 +9,10 @@ $ virtualenv -p python3 venv
 $ source venv/bin/activate
 ```
 
-First we will install Tornado
+First we will install some project dependencies
 
 ```
-(venv) $ pip install tornado
+(venv) $ pip install tornado==4.5.3
 ```
 
 The server and client have been split into two projects, to separate the

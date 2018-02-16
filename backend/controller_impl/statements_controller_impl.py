@@ -1,11 +1,11 @@
-import connexion
-import six
+import requests
 
-from swagger_server.models.statement import Statement  # noqa: E501
-from swagger_server import util
+from swagger_server.models.statement import Statement
+from swagger_server.models.statement_object import StatementObject
+from swagger_server.models.statement_subject import StatementSubject
+from swagger_server.models.statement_predicate import StatementPredicate
 
-import controller_impl.statements_controller_impl as impl
-
+from controller_impl import utils
 
 def get_statements(s, relations=None, t=None, keywords=None, semanticGroups=None, pageNumber=None, pageSize=None):  # noqa: E501
     """get_statements
@@ -29,4 +29,4 @@ def get_statements(s, relations=None, t=None, keywords=None, semanticGroups=None
 
     :rtype: List[Statement]
     """
-    return impl.get_statements(s, relations, t, keywords, semanticGroups, pageNumber, pageSize)
+    return 'do some magic!'
