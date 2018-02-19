@@ -24,6 +24,10 @@ def get_evidence(statementId, keywords=None, pageNumber=None, pageSize=None):  #
     pageNumber = utils.sanitize_int(pageNumber)
     pageSize = utils.sanitize_int(pageSize, default_value=5)
 
+    prefix = utils.biolink_prefix() + ':'
+    if statementId.startswith(prefix):
+        statementId = statementId[len(prefix):]
+
     path = utils.base_path() + 'association/' + statementId
     params = {'page' : pageNumber - 1, 'rows' : pageSize}
 

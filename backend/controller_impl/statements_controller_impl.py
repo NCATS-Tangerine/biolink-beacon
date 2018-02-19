@@ -1,9 +1,9 @@
-import requests
-
 from swagger_server.models.statement import Statement
 from swagger_server.models.statement_object import StatementObject
 from swagger_server.models.statement_subject import StatementSubject
 from swagger_server.models.statement_predicate import StatementPredicate
+
+from ontobio.golr.beacon_query import BeaconAssociationQuery
 
 from controller_impl import utils
 
@@ -29,4 +29,63 @@ def get_statements(s, relations=None, t=None, keywords=None, semanticGroups=None
 
     :rtype: List[Statement]
     """
-    return 'do some magic!'
+    pageNumber = utils.sanitize_int(pageNumber)
+    pageSize = utils.sanitize_int(pageSize, 5)
+
+    keywords = keywords.split(' ') if keywords != None else None
+    semanticGroups = semanticGroups.split(' ') if semanticGroups != None else None
+    relations = relations.split(' ') if relations != None else None
+
+    g = BeaconAssociationQuery(
+		sources=s,
+        targets=t,
+		keywords=keywords,
+        categories=semanticGroups,
+		relations=relations,
+        start=pageNumber,
+        rows=pageSize
+	)
+
+    results = g.exec()
+
+    associations = results['associations']
+
+    statements = []
+
+    for d in associations:
+        _subject = d['subject']
+        _object = d['object']
+        _relation = d['relation']
+
+        statement_subject = StatementSubject(
+            id=_subject['id'],
+            name=_subject['label'],
+            semantic_group=' '.join(_subject['categories'])
+        )
+
+        statement_object = StatementObject(
+            id=_object['id'],
+            name=_object['label'],
+            semantic_group=' '.join(_object['categories'])
+        )
+
+        statement_predicate = StatementPredicate(
+            id=_relation['id'],
+            name=_relation['label']
+        )
+
+        identifier = d['id']
+
+        if ':' not in identifier:
+            identifier = utils.biolink_prefix() + ':' + identifier
+
+        statement = Statement(
+            id=identifier,
+            subject=statement_subject,
+            predicate=statement_predicate,
+            object=statement_object
+        )
+
+        statements.append(statement)
+
+    return statements

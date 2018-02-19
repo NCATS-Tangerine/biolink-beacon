@@ -1,6 +1,15 @@
 def base_path():
     return 'https://api.monarchinitiative.org/api/'
 
+def biolink_prefix():
+    """
+    Biolink associations do not generally follow the curie syntax. In such cases
+    the resulting statement curie identifier will be set as:
+
+    biolink_prefix() + ':' + biolink_association_id
+    """
+    return 'biolink'
+
 def get_property(d, key, default_value=None):
     """
     Exhausts each affix before returning default value.
