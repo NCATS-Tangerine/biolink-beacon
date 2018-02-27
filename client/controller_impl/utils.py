@@ -49,3 +49,15 @@ def sanitize_int(i, default_value=1):
     Ensures that i is a positive integer
     """
     return i if isinstance(i, int) and i > 0 else default_value
+
+def try_multi(method, repeats=5, default_value=None, **kwargs):
+    """
+    Will attempt to call method a number of times, returning the
+    results if successful.
+    """
+    for i in range(repeats):
+        try:
+            return method(**kwargs)
+        except Exception as e:
+            pass
+    return default_value

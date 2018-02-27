@@ -1,8 +1,8 @@
 import requests
 
-from swagger_server.models.concept import Concept  # noqa: E501
-from swagger_server.models.concept_with_details import ConceptWithDetails  # noqa: E501
-from swagger_server.models.concept_detail import ConceptDetail
+from swagger_server.models.beacon_concept import BeaconConcept  # noqa: E501
+from swagger_server.models.beacon_concept_with_details import BeaconConceptWithDetails  # noqa: E501
+from swagger_server.models.beacon_concept_detail import BeaconConceptDetail
 
 from controller_impl import utils
 
@@ -14,38 +14,38 @@ def get_concept_details(conceptId):  # noqa: E501
     :param conceptId: (url-encoded) CURIE identifier of concept of interest
     :type conceptId: str
 
-    :rtype: List[ConceptWithDetails]
+    :rtype: List[BeaconConceptWithDetails]
     """
 
     json_response = requests.get(
         utils.base_path() + 'bioentity/' + conceptId
     ).json()
 
-    concept = ConceptWithDetails(
+    concept = BeaconConceptWithDetails(
         id=json_response.get('id', None),
         name=json_response.get('label', None),
-        semantic_group=' '.join(json_response.get('categories', [])),
+        type=' '.join(json_response.get('categories', [])),
         synonyms=[s['val'] for s in json_response.get('synonyms', []) if 'val' in s]
     )
 
     return [concept]
 
 
-def get_concepts(keywords, semanticGroups=None, pageNumber=None, pageSize=None):  # noqa: E501
+def get_concepts(keywords, types=None, pageNumber=None, pageSize=None):  # noqa: E501
     """get_concepts
 
     Retrieves a (paged) list of whose concept in the beacon knowledge base with names and/or synonyms matching a set of keywords or substrings. The (possibly paged) results returned should generally be returned in order of the quality of the match, that is, the highest ranked concepts should exactly match the most keywords, in the same order as the keywords were given. Lower quality hits with fewer keyword matches or out-of-order keyword matches, should be returned lower in the list.  # noqa: E501
 
     :param keywords: a (urlencoded) space delimited set of keywords or substrings against which to match concept names and synonyms
     :type keywords: str
-    :param semanticGroups: a (url-encoded) space-delimited set of semantic groups (specified as codes CHEM, GENE, ANAT, etc.) to which to constrain concepts matched by the main keyword search (see [Semantic Groups](https://metamap.nlm.nih.gov/Docs/SemGroups_2013.txt) for the full list of codes)
-    :type semanticGroups: str
+    :param types: a (url-encoded) space-delimited set of semantic groups (specified as codes CHEM, GENE, ANAT, etc.) to which to constrain concepts matched by the main keyword search (see [Semantic Groups](https://metamap.nlm.nih.gov/Docs/SemGroups_2013.txt) for the full list of codes)
+    :type types: str
     :param pageNumber: (1-based) number of the page to be returned in a paged set of query results
     :type pageNumber: int
     :param pageSize: number of concepts per page to be returned in a paged set of query results
     :type pageSize: int
 
-    :rtype: List[Concept]
+    :rtype: List[BeaconConcept]
     """
 
     json_response = requests.get(
@@ -53,21 +53,21 @@ def get_concepts(keywords, semanticGroups=None, pageNumber=None, pageSize=None):
         params={
             'rows': pageSize,
             'start': pageNumber,
-            'category': semanticGroups.split(' ') if semanticGroups is not None else None
+            'category': types.split(' ') if types is not None else None
         }
     ).json()
 
     concepts = []
 
     for d in json_response['docs']:
-        name = utils.sanitize_str(utils.get_property(d, 'id'))
-        semantic_group = utils.sanitize_str(utils.get_property(d, 'category'))
+        name = utils.sanitize_str(utils.get_property(d, 'label'))
+        category = utils.sanitize_str(utils.get_property(d, 'category'))
         definition = utils.sanitize_str(utils.get_property(d, 'definition'))
 
-        concept = Concept(
+        concept = BeaconConcept(
             id=utils.get_property(d, 'id'),
             name=name,
-            semantic_group=semantic_group,
+            type=category,
             synonyms=utils.get_property(d, 'synonym', []),
             definition=definition
         )

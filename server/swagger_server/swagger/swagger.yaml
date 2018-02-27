@@ -3,7 +3,7 @@ swagger: "2.0"
 info:
   description: "This is the Translator Knowledge Beacon web service application programming\
     \ interface (API).\n"
-  version: "1.0.15"
+  version: "1.0.16"
   title: "Translator Knowledge Beacon API"
   contact:
     url: "http://starinformatics.com"
@@ -11,21 +11,15 @@ info:
   license:
     name: "MIT License"
     url: "http://opensource.org/licenses/MIT"
-host: "reference-beacon.ncats.io"
+host: "biolink-kb.ncats.io"
 basePath: "/"
 tags:
-- name: "summary"
-  description: "Summary statistics about the knowledge source"
+- name: "metadata"
+  description: "Queries about global characteristics of the knowledge source"
 - name: "concepts"
-  description: "Queries for concepts"
-- name: "predicates"
-  description: "Queries for predicates"
-- name: "exactmatches"
-  description: "Queries for exactly matching concepts *sensa*-SKOS; http://www.w3.org/2004/02/skos/core#exactMatch"
+  description: "Queries relating to concepts"
 - name: "statements"
-  description: "Queries for concept-relationship statements"
-- name: "evidence"
-  description: "Queries for references cited as evidence for statements"
+  description: "Queries relating to concept-relationship statements and their evidence"
 schemes:
 - "https"
 produces:
@@ -34,10 +28,10 @@ paths:
   /types:
     get:
       tags:
-      - "summary"
+      - "metadata"
       description: "Get a list of types and # of instances in the knowledge source,\
         \ and a link to the API call for the list of equivalent terminology\n"
-      operationId: "linked_types"
+      operationId: "get_concept_types"
       parameters: []
       responses:
         200:
@@ -45,46 +39,92 @@ paths:
           schema:
             type: "array"
             items:
-              $ref: "#/definitions/Summary"
+              $ref: "#/definitions/BeaconConceptType"
           examples:
             application/json:
-            - id: "CHEM"
+            - id: "gene"
               frequency: 12355
-              idmap: "http://myservice.net/api/v1/exactmatches/CHEM"
-            - id: "ANAT"
+              idmap: "https://biolink.github.io/biolink-model/docs/Gene.html"
+            - id: "cell"
               frequency: 1234
-              idmap: "http://myservice.net/api/v1/exactmatches/ANAT"
-      x-swagger-router-controller: "swagger_server.controllers.summary_controller"
-  /concepts/{conceptId}:
+              idmap: "https://biolink.github.io/biolink-model/docs/Cell.html"
+      x-swagger-router-controller: "swagger_server.controllers.metadata_controller"
+  /predicates:
     get:
       tags:
-      - "concepts"
-      description: "Retrieves details for a specified concepts in the system, as specified\
-        \ by a (url-encoded) CURIE identifier of a concept known the given knowledge\
-        \ source.\n"
-      operationId: "get_concept_details"
-      parameters:
-      - name: "conceptId"
-        in: "path"
-        description: "(url-encoded) CURIE identifier of concept of interest"
-        required: true
-        type: "string"
+      - "metadata"
+      description: "Get a list of predicates used in statements issued by the knowledge\
+        \ source\n"
+      operationId: "get_predicates"
+      parameters: []
       responses:
         200:
-          description: "Successful response with concept details returned\n"
+          description: "Successful response with predicates with CURIE and definitions\
+            \ indexed by beacons which support the relation\n"
           schema:
             type: "array"
             items:
-              $ref: "#/definitions/ConceptWithDetails"
+              $ref: "#/definitions/BeaconPredicate"
           examples:
             application/json:
-            - id: "wd:Q14883734"
-              name: "WRN"
-              semanticGroup: "GENE"
-              synonyms: []
-              definition: "Werner Syndrome Gene"
-              details: []
-      x-swagger-router-controller: "swagger_server.controllers.concepts_controller"
+            - id: "wd:P123"
+              name: "interacts with"
+              definition: "influences in some manner"
+            - id: "wd:P456"
+              name: "has phenotype"
+              definition: "exhibits biological morphology or behaviour"
+      x-swagger-router-controller: "swagger_server.controllers.metadata_controller"
+  /kmap:
+    get:
+      tags:
+      - "metadata"
+      description: "Get a high level knowledge map of the all the beacons by subject\
+        \ semantic type, predicate and semantic object type\n"
+      operationId: "get_knowledge_map"
+      parameters: []
+      responses:
+        200:
+          description: "Successful response with types and frequency returned\n"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/BeaconKnowledgeMapStatement"
+          examples:
+            application/json:
+            - subject:
+                type: "gene"
+                prefixes:
+                - "DRUGBANK"
+                - "CHEMBL"
+                - "UNIPROT"
+              predicate:
+                id: "RO:0002606"
+                label: "is substance that treats"
+              object:
+                type: "disease or phenotypic feature"
+                prefixes:
+                - "MP"
+                - "HP"
+                - "DOID"
+              count: 500
+              description: "a small molecule or compound that is capable of some activity\
+                \ that negative regulates or decreases the magnitude of a pathological\
+                \ process, phenotype or disease\n"
+            - subject:
+                type: "drug"
+                prefixes:
+                - "DRUGBANK"
+                - "CHEMBL"
+              predicate:
+                id: "SIO:001250"
+                label: "chemical to pathway association"
+              object:
+                type: "pathway"
+                prefixes:
+                - "KEGG"
+              count: 100
+              description: "Drug interacts with a given protein\n"
+      x-swagger-router-controller: "swagger_server.controllers.metadata_controller"
   /concepts:
     get:
       tags:
@@ -104,11 +144,11 @@ paths:
           \ against which to match concept names and synonyms"
         required: true
         type: "string"
-      - name: "semanticGroups"
+      - name: "types"
         in: "query"
         description: "a (url-encoded) space-delimited set of semantic groups (specified\
-          \ as codes CHEM, GENE, ANAT, etc.) to which to constrain concepts matched\
-          \ by the main keyword search (see [Semantic Groups](https://metamap.nlm.nih.gov/Docs/SemGroups_2013.txt)\
+          \ as codes gene, pathway, etc.) to which to constrain concepts matched by\
+          \ the main keyword search (see [Biolink Model](https://biolink.github.io/biolink-model)\
           \ for the full list of codes)\n"
         required: false
         type: "string"
@@ -130,12 +170,12 @@ paths:
           schema:
             type: "array"
             items:
-              $ref: "#/definitions/Concept"
+              $ref: "#/definitions/BeaconConcept"
           examples:
             application/json:
             - id: "wd:Q6591532"
               name: "WRN protein, human"
-              semanticGroup: "CHEM"
+              type: "chemical substance"
               synonyms:
               - "RecQ3"
               - "Werner Syndrome ATP-Dependent Helicase"
@@ -157,7 +197,7 @@ paths:
                 ' exonuclease activity towards double-stranded DNA with a 5\\'-overhang."
             - id: "wd:Q18042562"
               name: "WRNIP1"
-              semanticGroup: "GENE"
+              type: "gene"
               synonyms:
               - "WHIP"
               - "Werner helicase interacting protein 1"
@@ -166,7 +206,7 @@ paths:
               definition: "human gene"
             - id: "wd:Q14883734"
               name: "WRN"
-              semanticGroup: "GENE"
+              type: "gene"
               synonyms:
               - "RECQ3"
               - "RECQL3"
@@ -175,7 +215,7 @@ paths:
               definition: "human gene"
             - id: "wd:Q1154619"
               name: "Werner Syndrome"
-              semanticGroup: "DISO"
+              type: "disease"
               synonyms:
               - "Werner Syndrome"
               - "Pangeria"
@@ -207,35 +247,40 @@ paths:
                 \ mellitus, aged appearance of the face, baldness, and a high incidence\
                 \ of neoplastic disease."
       x-swagger-router-controller: "swagger_server.controllers.concepts_controller"
-  /predicates:
+  /concepts/{conceptId}:
     get:
       tags:
-      - "predicates"
-      description: "Get a list of predicates used in statements issued by the knowledge\
-        \ source\n"
-      operationId: "get_predicates"
-      parameters: []
+      - "concepts"
+      description: "Retrieves details for a specified concepts in the system, as specified\
+        \ by a (url-encoded) CURIE identifier of a concept known the given knowledge\
+        \ source.\n"
+      operationId: "get_concept_details"
+      parameters:
+      - name: "conceptId"
+        in: "path"
+        description: "(url-encoded) CURIE identifier of concept of interest"
+        required: true
+        type: "string"
       responses:
         200:
-          description: "Successful response with predicates with CURIE and definitions\
-            \ indexed by beacons which support the relation\n"
+          description: "Successful response with concept details returned\n"
           schema:
             type: "array"
             items:
-              $ref: "#/definitions/Predicate"
+              $ref: "#/definitions/BeaconConceptWithDetails"
           examples:
             application/json:
-            - id: "wd:P123"
-              name: "interacts with"
-              definition: "influences in some manner"
-            - id: "wd:P456"
-              name: "has phenotype"
-              definition: "exhibits biological morphology or behaviour"
-      x-swagger-router-controller: "swagger_server.controllers.predicates_controller"
+            - id: "wd:Q14883734"
+              name: "WRN"
+              type: "gene"
+              synonyms: []
+              definition: "Werner Syndrome Gene"
+              details: []
+      x-swagger-router-controller: "swagger_server.controllers.concepts_controller"
   /exactmatches/{conceptId}:
     get:
       tags:
-      - "exactmatches"
+      - "concepts"
       description: "Retrieves a list of qualified identifiers of \"exact match\" concepts,\
         \ [sensa SKOS](http://www.w3.org/2004/02/skos/core#exactMatch) associated\
         \ with a specified (url-encoded) CURIE (without brackets) concept object identifier,\
@@ -262,11 +307,11 @@ paths:
             application/json:
             - "wd:Q14883734"
             - "NCBIGene:7486"
-      x-swagger-router-controller: "swagger_server.controllers.exactmatches_controller"
+      x-swagger-router-controller: "swagger_server.controllers.concepts_controller"
   /exactmatches:
     get:
       tags:
-      - "exactmatches"
+      - "concepts"
       description: "Given an input list of [CURIE](https://www.w3.org/TR/curie/) identifiers\
         \ of known exactly matched concepts [*sensa*-SKOS](http://www.w3.org/2004/02/skos/core#exactMatch),\
         \ retrieves the list of [CURIE](https://www.w3.org/TR/curie/) identifiers\
@@ -307,7 +352,7 @@ paths:
             application/json:
             - "wd:Q14883734"
             - "NCBIGene:7486"
-      x-swagger-router-controller: "swagger_server.controllers.exactmatches_controller"
+      x-swagger-router-controller: "swagger_server.controllers.concepts_controller"
   /statements:
     get:
       tags:
@@ -355,13 +400,12 @@ paths:
           \ of concept-relations matched by any of the input exact matching concepts\n"
         required: false
         type: "string"
-      - name: "semanticGroups"
+      - name: "types"
         in: "query"
-        description: "a (url-encoded, space-delimited) string of semantic groups (specified\
-          \ as codes CHEM, GENE, ANAT, etc.) to which to constrain the subject or\
-          \ object concepts associated with the query seed concept (see [Semantic\
-          \ Groups](https://metamap.nlm.nih.gov/Docs/SemGroups_2013.txt) for the full\
-          \ list of codes)\n"
+        description: "a (url-encoded, space-delimited) string of concept types (specified\
+          \ as codes gene, pathway, etc.) to which to constrain the subject or object\
+          \ concepts associated with the query seed concept (see [Biolink Model](https://biolink.github.io/biolink-model)\
+          \ for the full list of codes)\n"
         required: false
         type: "string"
       - name: "pageNumber"
@@ -384,7 +428,7 @@ paths:
           schema:
             type: "array"
             items:
-              $ref: "#/definitions/Statement"
+              $ref: "#/definitions/BeaconStatement"
           examples:
             application/json:
             - source: "semmeddb"
@@ -393,7 +437,7 @@ paths:
                 id:
                 - "wd:Q14912054"
                 name: "KCNJ11"
-                semanticGroup: "GENE"
+                type: "gene"
               predicate:
                 id:
                 - "kbp:10"
@@ -402,12 +446,12 @@ paths:
                 id:
                 - "wd:Q2898645"
                 name: "Neonatal diabetes mellitus"
-                semanticGroup: "DISO"
+                type: "disease"
       x-swagger-router-controller: "swagger_server.controllers.statements_controller"
   /evidence/{statementId}:
     get:
       tags:
-      - "evidence"
+      - "statements"
       description: "Retrieves a (paged) list of annotations cited as evidence for\
         \ a specified concept-relationship statement\n"
       operationId: "get_evidence"
@@ -442,7 +486,7 @@ paths:
           schema:
             type: "array"
             items:
-              $ref: "#/definitions/Annotation"
+              $ref: "#/definitions/BeaconAnnotation"
           examples:
             application/json:
             - id:
@@ -451,9 +495,52 @@ paths:
                 \ coincidence or concurrent etiology?"
               type: "TAS"
               date: "2012-07-10T00:00:00.000+0000"
-      x-swagger-router-controller: "swagger_server.controllers.evidence_controller"
+      x-swagger-router-controller: "swagger_server.controllers.statements_controller"
 definitions:
-  Concept:
+  BeaconStatement:
+    properties:
+      id:
+        type: "string"
+        description: "CURIE-encoded identifier for statement (can be used to retrieve\
+          \ associated evidence)"
+      subject:
+        $ref: "#/definitions/BeaconStatementSubject"
+      predicate:
+        $ref: "#/definitions/BeaconStatementPredicate"
+      object:
+        $ref: "#/definitions/BeaconStatementObject"
+  BeaconKnowledgeMapPredicate:
+    properties:
+      id:
+        type: "string"
+        description: "CURIE of the predicate of the given relationship"
+      name:
+        type: "string"
+        description: "human readable name of the given relationship predicate"
+  BeaconStatementPredicate:
+    properties:
+      id:
+        type: "string"
+        description: "CURIE-encoded identifier of predicate resource\n"
+      name:
+        type: "string"
+        description: "human readable label of concept"
+  BeaconKnowledgeMapStatement:
+    properties:
+      subject:
+        $ref: "#/definitions/BeaconKnowledgeMapSubject"
+      predicate:
+        $ref: "#/definitions/BeaconKnowledgeMapPredicate"
+      object:
+        $ref: "#/definitions/BeaconKnowledgeMapObject"
+      frequency:
+        type: "integer"
+        description: "the frequency of statements of the specified relationship within\
+          \ the given beacon\n"
+      description:
+        type: "string"
+        description: "a description of the nature of the relationship\n"
+  BeaconConcept:
     properties:
       id:
         type: "string"
@@ -462,7 +549,7 @@ definitions:
       name:
         type: "string"
         description: "canonical human readable name of the concept\n"
-      semanticGroup:
+      type:
         type: "string"
         description: "concept semantic type\n"
       synonyms:
@@ -473,7 +560,73 @@ definitions:
       definition:
         type: "string"
         description: "concept definition\n"
-  ConceptWithDetails:
+  BeaconConceptDetail:
+    properties:
+      tag:
+        type: "string"
+        description: "property name\n"
+      value:
+        type: "string"
+        description: "property value\n"
+  BeaconPredicate:
+    properties:
+      id:
+        type: "string"
+        description: "CURIE-encoded identifier of predicate resource\n"
+      name:
+        type: "string"
+        description: "human readable name of predicate relation\n"
+      definition:
+        type: "string"
+        description: "human readable definition of predicate relation provided by\
+          \ this beacon\n"
+  BeaconStatementSubject:
+    properties:
+      id:
+        type: "string"
+        description: "CURIE-encoded identifier of concept\n"
+      name:
+        type: "string"
+        description: "human readable label of subject concept"
+      type:
+        type: "string"
+        description: "a semantic group for the subject concept (specified as a code\
+          \ gene, pathway, disease, etc. - see [Biolink Model](https://biolink.github.io/biolink-model)\
+          \ for the full list of codes)\n"
+  BeaconConceptType:
+    properties:
+      id:
+        type: "string"
+        description: "the type\n"
+      idmap:
+        type: "string"
+        description: "The URL to execute the exactmatches API call on the id"
+      frequency:
+        type: "integer"
+        description: "the number of instances of the specified type\n"
+  BeaconKnowledgeMapObject:
+    properties:
+      type:
+        type: "string"
+        description: "the concept semantic type of a statement object\n"
+      prefixes:
+        type: "array"
+        items:
+          type: "string"
+          description: "the prefix of the namespace of statement object concept identifiers\
+            \ which may conceivably be bound to the given relationship\n"
+  BeaconKnowledgeMapSubject:
+    properties:
+      type:
+        type: "string"
+        description: "the concept semantic type of a statement subject\n"
+      prefixes:
+        type: "array"
+        items:
+          type: "string"
+          description: "the prefix of the namespace of statement subject concept identifiers\
+            \ which may conceivably be bound to the given relationship\n"
+  BeaconConceptWithDetails:
     properties:
       id:
         type: "string"
@@ -482,7 +635,7 @@ definitions:
       name:
         type: "string"
         description: "canonical human readable name of the concept\n"
-      semanticGroup:
+      type:
         type: "string"
         description: "concept semantic type\n"
       synonyms:
@@ -496,47 +649,8 @@ definitions:
       details:
         type: "array"
         items:
-          $ref: "#/definitions/ConceptDetail"
-  StatementPredicate:
-    properties:
-      id:
-        type: "string"
-        description: "CURIE-encoded identifier of predicate resource\n"
-      name:
-        type: "string"
-        description: "human readable label of concept"
-  Statement:
-    properties:
-      id:
-        type: "string"
-        description: "CURIE-encoded identifier for statement (can be used to retrieve\
-          \ associated evidence)"
-      subject:
-        $ref: "#/definitions/StatementSubject"
-      predicate:
-        $ref: "#/definitions/StatementPredicate"
-      object:
-        $ref: "#/definitions/StatementObject"
-  Summary:
-    properties:
-      id:
-        type: "string"
-        description: "the type\n"
-      idmap:
-        type: "string"
-        description: "The URL to execute the exactmatches API call on the id"
-      frequency:
-        type: "integer"
-        description: "the number of instances of the specified type\n"
-  ConceptDetail:
-    properties:
-      tag:
-        type: "string"
-        description: "property name\n"
-      value:
-        type: "string"
-        description: "property value\n"
-  StatementObject:
+          $ref: "#/definitions/BeaconConceptDetail"
+  BeaconStatementObject:
     properties:
       id:
         type: "string"
@@ -544,12 +658,12 @@ definitions:
       name:
         type: "string"
         description: "human readable label of object concept"
-      semanticGroup:
+      type:
         type: "string"
         description: "a semantic group for the object concept (specified as a code\
-          \ CHEM, GENE, etc. - see [Semantic Groups](https://metamap.nlm.nih.gov/Docs/SemGroups_2013.txt)\
+          \ gene, pathway, disease, etc. - see [Biolink Model](https://biolink.github.io/biolink-model)\
           \ for the full list of codes)\n"
-  Annotation:
+  BeaconAnnotation:
     properties:
       id:
         type: "string"
@@ -565,28 +679,3 @@ definitions:
       date:
         type: "string"
         description: "publication date of annotation (generally of format 'yyyy-mm-dd')\n"
-  Predicate:
-    properties:
-      id:
-        type: "string"
-        description: "CURIE-encoded identifier of predicate resource\n"
-      name:
-        type: "string"
-        description: "human readable name of predicate relation\n"
-      definition:
-        type: "string"
-        description: "human readable definition of predicate relation provided by\
-          \ this beacon\n"
-  StatementSubject:
-    properties:
-      id:
-        type: "string"
-        description: "CURIE-encoded identifier of concept\n"
-      name:
-        type: "string"
-        description: "human readable label of subject concept"
-      semanticGroup:
-        type: "string"
-        description: "a semantic group for the subject concept (specified as a code\
-          \ CHEM, GENE, etc. - see [Semantic Groups](https://metamap.nlm.nih.gov/Docs/SemGroups_2013.txt)\
-          \ for the full list of codes)\n"

@@ -1,13 +1,13 @@
-from swagger_server.models.statement import Statement
-from swagger_server.models.statement_object import StatementObject
-from swagger_server.models.statement_subject import StatementSubject
-from swagger_server.models.statement_predicate import StatementPredicate
+from swagger_server.models.beacon_statement import BeaconStatement
+from swagger_server.models.beacon_statement_object import BeaconStatementObject
+from swagger_server.models.beacon_statement_subject import BeaconStatementSubject
+from swagger_server.models.beacon_statement_predicate import BeaconStatementPredicate
 
 from ontobio.golr.beacon_query import BeaconAssociationQuery
 
 from controller_impl import utils
 
-def get_statements(s, relations=None, t=None, keywords=None, semanticGroups=None, pageNumber=None, pageSize=None):  # noqa: E501
+def get_statements(s, relations=None, t=None, keywords=None, types=None, pageNumber=None, pageSize=None):  # noqa: E501
     """get_statements
 
     Given a specified set of [CURIE-encoded](https://www.w3.org/TR/curie/) &#39;source&#39; (&#39;s&#39;) concept identifiers,  retrieves a paged list of relationship statements where either the subject or object concept matches any of the input &#39;source&#39; concepts provided.  Optionally, a set of &#39;target&#39; (&#39;t&#39;) concept  identifiers may also be given, in which case a member of the &#39;target&#39; identifier set should match the concept opposing the &#39;source&#39; in the  statement, that is, if the&#39;source&#39; matches a subject, then the  &#39;target&#39; should match the object of a given statement (or vice versa).  # noqa: E501
@@ -20,8 +20,8 @@ def get_statements(s, relations=None, t=None, keywords=None, semanticGroups=None
     :type t: List[str]
     :param keywords: a (url-encoded, space-delimited) string of keywords or substrings against which to match the subject, predicate or object names of the set of concept-relations matched by any of the input exact matching concepts
     :type keywords: str
-    :param semanticGroups: a (url-encoded, space-delimited) string of semantic groups (specified as codes CHEM, GENE, ANAT, etc.) to which to constrain the subject or object concepts associated with the query seed concept (see [Semantic Groups](https://metamap.nlm.nih.gov/Docs/SemGroups_2013.txt) for the full list of codes)
-    :type semanticGroups: str
+    :param types: a (url-encoded, space-delimited) string of semantic groups (specified as codes CHEM, GENE, ANAT, etc.) to which to constrain the subject or object concepts associated with the query seed concept (see [Semantic Groups](https://metamap.nlm.nih.gov/Docs/SemGroups_2013.txt) for the full list of codes)
+    :type types: str
     :param pageNumber: (1-based) number of the page to be returned in a paged set of query results
     :type pageNumber: int
     :param pageSize: number of concepts per page to be returned in a paged set of query results
@@ -33,20 +33,20 @@ def get_statements(s, relations=None, t=None, keywords=None, semanticGroups=None
     pageSize = utils.sanitize_int(pageSize, 5)
 
     keywords = keywords.split(' ') if keywords != None else None
-    semanticGroups = semanticGroups.split(' ') if semanticGroups != None else None
+    types = types.split(' ') if types != None else None
     relations = relations.split(' ') if relations != None else None
 
     g = BeaconAssociationQuery(
-		sources=s,
+    	sources=s,
         targets=t,
-		keywords=keywords,
-        categories=semanticGroups,
-		relations=relations,
+    	keywords=keywords,
+        categories=types,
+    	relations=relations,
         start=pageNumber,
         rows=pageSize
-	)
+    )
 
-    results = g.exec()
+    results = utils.try_multi(method=g.exec, times=5, default_value={})
 
     associations = results['associations']
 
@@ -57,19 +57,19 @@ def get_statements(s, relations=None, t=None, keywords=None, semanticGroups=None
         _object = d['object']
         _relation = d['relation']
 
-        statement_subject = StatementSubject(
+        statement_subject = BeaconStatementSubject(
             id=_subject['id'],
             name=_subject['label'],
-            semantic_group=' '.join(_subject['categories'])
+            type=' '.join(_subject['categories'])
         )
 
-        statement_object = StatementObject(
+        statement_object = BeaconStatementObject(
             id=_object['id'],
             name=_object['label'],
-            semantic_group=' '.join(_object['categories'])
+            type=' '.join(_object['categories'])
         )
 
-        statement_predicate = StatementPredicate(
+        statement_predicate = BeaconStatementPredicate(
             id=_relation['id'],
             name=_relation['label']
         )
@@ -79,7 +79,7 @@ def get_statements(s, relations=None, t=None, keywords=None, semanticGroups=None
         if ':' not in identifier:
             identifier = utils.biolink_prefix() + ':' + identifier
 
-        statement = Statement(
+        statement = BeaconStatement(
             id=identifier,
             subject=statement_subject,
             predicate=statement_predicate,

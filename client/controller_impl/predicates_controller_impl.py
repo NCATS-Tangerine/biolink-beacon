@@ -1,5 +1,5 @@
 from ontobio.golr.golr_query import GolrAssociationQuery, M
-from swagger_server.models.predicate import Predicate
+from swagger_server.models.beacon_predicate import BeaconPredicate
 
 def get_predicates():
 	"""get_predicates
@@ -28,7 +28,7 @@ def get_predicates():
 			# not currently used
 			count = pivot['count']
 			name = pivot['value']
-			predicate = Predicate(id=identifier, name=name, definition=None)
+			predicate = BeaconPredicate(id=identifier, name=name, definition=None)
 			predicates.append(predicate)
 
 	return predicates

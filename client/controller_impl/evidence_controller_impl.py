@@ -1,8 +1,10 @@
 import requests
 
-from swagger_server.models.annotation import Annotation  # noqa: E501
+from swagger_server.models.beacon_annotation import BeaconAnnotation  # noqa: E501
 
 from controller_impl import utils
+
+__DEFAULT_PUBMED_LABEL = 'unspecified PubMed article'
 
 
 def get_evidence(statementId, keywords=None, pageNumber=None, pageSize=None):  # noqa: E501
@@ -39,10 +41,14 @@ def get_evidence(statementId, keywords=None, pageNumber=None, pageSize=None):  #
 
     if publications != None and publications != []:
         for publication in publications:
-            annotation = Annotation(
-                id=publication.get('id', ''),
-                label=publication.get('label', 'unspecified PubMed article')
-            )
+            identifier=publication.get('id', '')
+
+            is_pubmed = identifier.upper().startswith('PMID:')
+
+            label = publication.get('label', None)
+            label = __DEFAULT_PUBMED_LABEL if label is None and is_pubmed else label
+
+            annotation = BeaconAnnotation(id=identifier, label=label)
             annotations.append(annotation)
 
     return annotations
