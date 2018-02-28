@@ -120,7 +120,10 @@ def get_knowledge_map():
 
 	return statements
 
-def __build_category_counts(d, counts={}):
+def __build_category_counts(d, counts=None):
+	if counts is None:
+		counts = {}
+
 	for k in d.keys():
 		if k not in counts:
 			counts[k] = d[k]
