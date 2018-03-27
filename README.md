@@ -1,6 +1,6 @@
 # Biolink Beacon
 
-A knowledge beacon implementation for the Monarch Biolink API (https://api.monarchinitiative.org/api/). A biomedical data source containing information about diseases, phenotypes, and genes, and the relations between them.
+A knowledge beacon implementation for the Monarch Biolink API (https://api.monarchinitiative.org/api/), a biomedical data source containing information about diseases, phenotypes, and genes, and the relations between them.
 
 ## Running with Docker
 
