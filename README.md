@@ -1,46 +1,84 @@
-# Using without Docker (for now)
+# Biolink Beacon
 
-## Setup
+A knowledge beacon implementation for the Monarch Biolink API (https://api.monarchinitiative.org/api/). A disease, phenotype, and gene ontology.
 
-It's recommended that you use a virtual environment, and python 3
+## Running with Docker
 
-```
-$ virtualenv -p python3 venv
-$ source venv/bin/activate
-```
-
-First we will install some project dependencies
-
-```
-(venv) $ pip install tornado==4.5.3 ontobio==0.2.29
-```
-
-**Note:** The above ontobio will not work as of yet. You will need to clone git clone -b issue-143 https://github.com/biolink/ontobio.git and install (look at the Dockerfile) for now.
-
-The server and client have been split into two projects, to separate the
-Swagger generated code stub, and the implementation details. Because of this
-we can safely overwrite the `server` directory and not worry about overwriting
-our work.
-
-Install swagger_server
-
-```
-(venv) $ cd server
-(venv) $ python setup.py install
-```
-
-Install controller_impl
-
-```
-(venv) $ cd client
-(venv) $ python setup.py install
-```
-
-## Running
-
-```
-(venv) $ cd server
-(venv) $ python -m swagger_server
+```shell
+docker build -t biolinkbeacon .
+docker run -p 8080:8080 biolinkbeacon
 ```
 
 Navigate to http://localhost:8080/ui/ in your browser to see the Swagger UI
+
+## Usage
+http://localhost:8080/concepts?keywords=FANC&pageSize=1
+```
+[
+  {
+    "definition": "A Fanconi anemia that has_material_basis_in homozygous or compound heterozygous mutation in the FANCA gene on chromosome 16q24.",
+    "id": "MONDO:0009215",
+    "name": "Fanconi anemia complementation group a",
+    "synonyms": [
+      "Estren-Dameshek Variant of Fanconi Anemia",
+      "FANCONI ANEMIA, COMPLEMENTATION GROUP A",
+      "Fanconi Anemia",
+      "FANCA",
+      "Fanconi Anemia, Estren-Dameshek Variant",
+      "Estren-Dameshek Variant of Fanconi Pancytopenia",
+      "Fanconi anemia complementation group type A",
+      "FANCONI ANEMIA, COMPLEMENTATION GROUP A; FANCA",
+      "Fanconi Anemia, Complementation Group type a"
+    ],
+    "type": "disease"
+  }
+]
+```
+http://localhost:8080/statements?s=MONDO:0009215&pageSize=1
+
+```
+[
+  {
+    "id": "biolink:06c7f4a5-65e5-4243-bbdd-ab92ced62997",
+    "object": {
+      "id": "HP:0000252",
+      "name": "Microcephaly",
+      "type": "phenotype"
+    },
+    "predicate": {
+      "id": "RO:0002200",
+      "name": "has phenotype"
+    },
+    "subject": {
+      "id": "MONDO:0009215",
+      "name": "Fanconi anemia complementation group a",
+      "type": "disease"
+    }
+  }
+]
+```
+http://localhost:8080/concepts/HP:0000252
+```
+[
+  {
+    "id": "HP:0000252",
+    "name": "Microcephaly",
+    "synonyms": [
+      "Reduced head circumference",
+      "Abnormally small skull",
+      "Decreased size of cranium",
+      "Decreased circumference of cranium",
+      "small cranium",
+      "Small head circumference",
+      "Abnormally small cranium",
+      "Decreased size of head",
+      "Decreased size of skull",
+      "Abnormally small head",
+      "Small head",
+      "small calvarium",
+      "Small skull"
+    ],
+    "type": "Phenotype"
+  }
+]
+```

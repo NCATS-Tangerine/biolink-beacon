@@ -1,16 +1,21 @@
-FROM python:3-alpine
+FROM python:3
 
-RUN mkdir -p /usr/src/app
-WORKDIR /usr/src/app
+RUN mkdir -p /usr/src
 
-# COPY requirements.txt /usr/src/app/
+COPY /server /usr/src/server
+COPY /client /usr/src/client
+COPY requirements.txt /usr/src/requirements.txt
 
-# RUN pip3 install --no-cache-dir -r requirements.txt
+# include --no-cache-dir flag when development finalizes?
+RUN pip install -r /usr/src/requirements.txt
 
-COPY . /usr/src/app
+WORKDIR /usr/src/server
+RUN python setup.py install
 
-RUN cd ontobio && pip3 install -e .[dev,test] && cd server && python setup.py install && cd .. && cd client && python setup.py install && cd .. && cd server
+WORKDIR /usr/src/client
+RUN python setup.py install
 
+WORKDIR /usr/src/server
 
 EXPOSE 8080
 
