@@ -49,11 +49,11 @@ def get_concepts(keywords, types=None, pageNumber=None, pageSize=None):  # noqa:
     """
 
     json_response = requests.get(
-        utils.base_path() + 'search/entity/' + keywords,
+        utils.base_path() + 'search/entity/' + ' '.join(keywords),
         params={
             'rows': pageSize,
             'start': pageNumber,
-            'category': types.split(' ') if types is not None else None
+            'category': types
         }
     ).json()
 
