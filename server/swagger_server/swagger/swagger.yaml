@@ -3,7 +3,7 @@ swagger: "2.0"
 info:
   description: "This is the Translator Knowledge Beacon web service application programming\
     \ interface (API).\n"
-  version: "1.0.16"
+  version: "1.0.17"
   title: "Translator Knowledge Beacon API"
   contact:
     url: "http://starinformatics.com"
@@ -11,7 +11,7 @@ info:
   license:
     name: "MIT License"
     url: "http://opensource.org/licenses/MIT"
-# host: "biolink-kb.ncats.io"
+#host: "rkb.ncats.io"
 basePath: "/"
 tags:
 - name: "metadata"
@@ -42,12 +42,14 @@ paths:
               $ref: "#/definitions/BeaconConceptType"
           examples:
             application/json:
-            - id: "gene"
+            - id: "biolink:gene"
+              iri: "http://bioentity.io/vocab/Gene"
+              label: "gene"
               frequency: 12355
-              idmap: "https://biolink.github.io/biolink-model/docs/Gene.html"
-            - id: "cell"
+            - id: "biolink:cell"
+              iri: "http://bioentity.io/vocab/Cell"
+              label: "cell"
               frequency: 1234
-              idmap: "https://biolink.github.io/biolink-model/docs/Cell.html"
       x-swagger-router-controller: "swagger_server.controllers.metadata_controller"
   /predicates:
     get:
@@ -129,13 +131,13 @@ paths:
     get:
       tags:
       - "concepts"
-      description: "Retrieves a (paged) list of whose concept in the\nbeacon knowledge\
-        \ base with names and/or synonyms\nmatching a set of keywords or substrings.\n\
-        The (possibly paged) results returned should generally\nbe returned in order\
-        \ of the quality of the match,\nthat is, the highest ranked concepts should\
-        \ exactly\nmatch the most keywords, in the same order as the\nkeywords were\
-        \ given. Lower quality hits with fewer\nkeyword matches or out-of-order keyword\
-        \ matches,\nshould be returned lower in the list.\n"
+      description: "Retrieves a (paged) list of whose concept in the \nbeacon knowledge\
+        \ base with names and/or synonyms \nmatching a set of keywords or substrings.\
+        \ \nThe (possibly paged) results returned should generally \nbe returned in\
+        \ order of the quality of the match, \nthat is, the highest ranked concepts\
+        \ should exactly \nmatch the most keywords, in the same order as the \nkeywords\
+        \ were given. Lower quality hits with fewer \nkeyword matches or out-of-order\
+        \ keyword matches, \nshould be returned lower in the list.\n"
       operationId: "get_concepts"
       parameters:
       - name: "keywords"
@@ -143,7 +145,9 @@ paths:
         description: "a (urlencoded) space delimited set of keywords or substrings\
           \ against which to match concept names and synonyms"
         required: true
-        type: "string"
+        type: "array"
+        items:
+          type: "string"
       - name: "types"
         in: "query"
         description: "a (url-encoded) space-delimited set of semantic groups (specified\
@@ -151,7 +155,9 @@ paths:
           \ the main keyword search (see [Biolink Model](https://biolink.github.io/biolink-model)\
           \ for the full list of codes)\n"
         required: false
-        type: "string"
+        type: "array"
+        items:
+          type: "string"
       - name: "pageNumber"
         in: "query"
         description: "(1-based) number of the page to be returned in a paged set of\
@@ -285,7 +291,7 @@ paths:
         \ [sensa SKOS](http://www.w3.org/2004/02/skos/core#exactMatch) associated\
         \ with a specified (url-encoded) CURIE (without brackets) concept object identifier,\
         \  typically, of a concept selected from the list of concepts originally returned\
-        \ by a /concepts API call on a given KS.\n"
+        \ by a /concepts API call on a given KS. \n"
       operationId: "get_exact_matches_to_concept"
       parameters:
       - name: "conceptId"
@@ -298,7 +304,7 @@ paths:
           description: "Successful response returns a set of [CURIE](https://www.w3.org/TR/curie/)\
             \ identifiers to 3rd party concepts defined outside of the local KS, which\
             \ are deemed semantic exact matches [*sensa*-SKOS](http://www.w3.org/2004/02/skos/core#exactMatch)\
-            \ to the specified identified concept (maybe an empty set?)\n"
+            \ to  the specified identified concept (maybe an empty set?)\n"
           schema:
             type: "array"
             items:
@@ -358,7 +364,7 @@ paths:
       tags:
       - "statements"
       description: "Given a specified set of [CURIE-encoded](https://www.w3.org/TR/curie/)\
-        \ 'source' ('s') concept identifiers,  retrieves a paged list of relationship\
+        \  'source' ('s') concept identifiers,  retrieves a paged list of relationship\
         \ statements where either the subject or object concept matches any of the\
         \ input 'source' concepts provided.  Optionally, a set of 'target' ('t') concept\
         \  identifiers may also be given, in which case a member of the 'target' identifier\
@@ -399,7 +405,9 @@ paths:
           \ against which to match the subject, predicate or object names of the set\
           \ of concept-relations matched by any of the input exact matching concepts\n"
         required: false
-        type: "string"
+        type: "array"
+        items:
+          type: "string"
       - name: "types"
         in: "query"
         description: "a (url-encoded, space-delimited) string of concept types (specified\
@@ -407,7 +415,9 @@ paths:
           \ concepts associated with the query seed concept (see [Biolink Model](https://biolink.github.io/biolink-model)\
           \ for the full list of codes)\n"
         required: false
-        type: "string"
+        type: "array"
+        items:
+          type: "string"
       - name: "pageNumber"
         in: "query"
         description: "(1-based) number of the page to be returned in a paged set of\
@@ -467,7 +477,9 @@ paths:
         description: "(url-encoded, space delimited) keyword filter to apply against\
           \ the label field of the annotation\n"
         required: false
-        type: "string"
+        type: "array"
+        items:
+          type: "string"
       - name: "pageNumber"
         in: "query"
         description: "(1-based) number of the page to be returned in a paged set of\
@@ -597,13 +609,18 @@ definitions:
     properties:
       id:
         type: "string"
-        description: "the type\n"
-      idmap:
+        description: "the CURIE of the type"
+      iri:
         type: "string"
-        description: "The URL to execute the exactmatches API call on the id"
+        description: "The full IRI, generally resolve the full semantic description\
+          \ of the type"
+      label:
+        type: "string"
+        description: "human readable name (\"rdfs:label\")"
       frequency:
         type: "integer"
-        description: "the number of instances of the specified type\n"
+        description: "the number of concept entries of the specified type in the beacon\
+          \ knowledge base"
   BeaconKnowledgeMapObject:
     properties:
       type:

@@ -159,9 +159,9 @@ __idmaps = {
 
 def __lookup_idmaps(category):
 	if category in __idmaps:
-		return __idmaps[category]
+		return ', '.join(__idmaps[category])
 	else:
-		return None
+		return ''
 
 def __get_category_prefix_map():
 	prefixes = requests.get(__MONARCH_PREFIX_URI).json()

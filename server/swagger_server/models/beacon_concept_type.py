@@ -15,30 +15,35 @@ class BeaconConceptType(Model):
     Do not edit the class manually.
     """
 
-    def __init__(self, id: str=None, idmap: str=None, frequency: int=None):  # noqa: E501
+    def __init__(self, id: str=None, iri: str=None, label: str=None, frequency: int=None):  # noqa: E501
         """BeaconConceptType - a model defined in Swagger
 
         :param id: The id of this BeaconConceptType.  # noqa: E501
         :type id: str
-        :param idmap: The idmap of this BeaconConceptType.  # noqa: E501
-        :type idmap: str
+        :param iri: The iri of this BeaconConceptType.  # noqa: E501
+        :type iri: str
+        :param label: The label of this BeaconConceptType.  # noqa: E501
+        :type label: str
         :param frequency: The frequency of this BeaconConceptType.  # noqa: E501
         :type frequency: int
         """
         self.swagger_types = {
             'id': str,
-            'idmap': str,
+            'iri': str,
+            'label': str,
             'frequency': int
         }
 
         self.attribute_map = {
             'id': 'id',
-            'idmap': 'idmap',
+            'iri': 'iri',
+            'label': 'label',
             'frequency': 'frequency'
         }
 
         self._id = id
-        self._idmap = idmap
+        self._iri = iri
+        self._label = label
         self._frequency = frequency
 
     @classmethod
@@ -56,7 +61,7 @@ class BeaconConceptType(Model):
     def id(self) -> str:
         """Gets the id of this BeaconConceptType.
 
-        the type   # noqa: E501
+        the CURIE of the type  # noqa: E501
 
         :return: The id of this BeaconConceptType.
         :rtype: str
@@ -67,7 +72,7 @@ class BeaconConceptType(Model):
     def id(self, id: str):
         """Sets the id of this BeaconConceptType.
 
-        the type   # noqa: E501
+        the CURIE of the type  # noqa: E501
 
         :param id: The id of this BeaconConceptType.
         :type id: str
@@ -76,33 +81,56 @@ class BeaconConceptType(Model):
         self._id = id
 
     @property
-    def idmap(self) -> str:
-        """Gets the idmap of this BeaconConceptType.
+    def iri(self) -> str:
+        """Gets the iri of this BeaconConceptType.
 
-        The URL to execute the exactmatches API call on the id  # noqa: E501
+        The full IRI, generally resolve the full semantic description of the type  # noqa: E501
 
-        :return: The idmap of this BeaconConceptType.
+        :return: The iri of this BeaconConceptType.
         :rtype: str
         """
-        return self._idmap
+        return self._iri
 
-    @idmap.setter
-    def idmap(self, idmap: str):
-        """Sets the idmap of this BeaconConceptType.
+    @iri.setter
+    def iri(self, iri: str):
+        """Sets the iri of this BeaconConceptType.
 
-        The URL to execute the exactmatches API call on the id  # noqa: E501
+        The full IRI, generally resolve the full semantic description of the type  # noqa: E501
 
-        :param idmap: The idmap of this BeaconConceptType.
-        :type idmap: str
+        :param iri: The iri of this BeaconConceptType.
+        :type iri: str
         """
 
-        self._idmap = idmap
+        self._iri = iri
+
+    @property
+    def label(self) -> str:
+        """Gets the label of this BeaconConceptType.
+
+        human readable name (\"rdfs:label\")  # noqa: E501
+
+        :return: The label of this BeaconConceptType.
+        :rtype: str
+        """
+        return self._label
+
+    @label.setter
+    def label(self, label: str):
+        """Sets the label of this BeaconConceptType.
+
+        human readable name (\"rdfs:label\")  # noqa: E501
+
+        :param label: The label of this BeaconConceptType.
+        :type label: str
+        """
+
+        self._label = label
 
     @property
     def frequency(self) -> int:
         """Gets the frequency of this BeaconConceptType.
 
-        the number of instances of the specified type   # noqa: E501
+        the number of concept entries of the specified type in the beacon knowledge base  # noqa: E501
 
         :return: The frequency of this BeaconConceptType.
         :rtype: int
@@ -113,7 +141,7 @@ class BeaconConceptType(Model):
     def frequency(self, frequency: int):
         """Sets the frequency of this BeaconConceptType.
 
-        the number of instances of the specified type   # noqa: E501
+        the number of concept entries of the specified type in the beacon knowledge base  # noqa: E501
 
         :param frequency: The frequency of this BeaconConceptType.
         :type frequency: int
