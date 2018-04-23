@@ -21,11 +21,13 @@ def get_concept_details(conceptId):  # noqa: E501
         utils.base_path() + 'bioentity/' + conceptId
     ).json()
 
+    json_response = {k : v for k, v in json_response.items() if v is not None}
+
     concept = BeaconConceptWithDetails(
         id=json_response.get('id', None),
         name=json_response.get('label', None),
         type=' '.join(json_response.get('categories', [])),
-        synonyms=[s['val'] for s in json_response.get('synonyms', []) if 'val' in s]
+        synonyms=json_response.get('synonyms', [])
     )
 
     return [concept]

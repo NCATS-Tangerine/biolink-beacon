@@ -1,5 +1,6 @@
 def base_path():
-    return 'https://api.monarchinitiative.org/api/'
+    # return 'https://api.monarchinitiative.org/api/'
+    return 'https://owlsim.monarchinitiative.org/api/'
 
 def biolink_prefix():
     """

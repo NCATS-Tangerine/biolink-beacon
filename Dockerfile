@@ -7,7 +7,7 @@ COPY /client /usr/src/client
 COPY requirements.txt /usr/src/requirements.txt
 
 # include --no-cache-dir flag when development finalizes?
-RUN pip install -r /usr/src/requirements.txt
+RUN pip install --upgrade pip && pip install -r /usr/src/requirements.txt
 
 WORKDIR /usr/src/server
 RUN python setup.py install

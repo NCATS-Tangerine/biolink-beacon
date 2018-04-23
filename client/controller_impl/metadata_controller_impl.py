@@ -36,15 +36,24 @@ def get_concept_types():  # noqa: E501
 
 	summaries = []
 
+	baseIri = 'https://biolink.github.io/biolink-model/docs/{}.html'
+
 	for category in counts:
+		iri = baseIri.format(toCamelCase(category))
+
 		summary = BeaconConceptType(
-			id=category,
+			id='biolink:' + category,
+			label=category,
 			frequency=counts[category],
-			idmap=__lookup_idmaps(category)
+			iri=iri
+			# idmap=' '.join(__lookup_idmaps(category))
 		)
 		summaries.append(summary)
 
 	return summaries
+
+def toCamelCase(s):
+	return ''.join(s.title().split(' '))
 
 def get_knowledge_map():
 	"""get_knowledge_map
