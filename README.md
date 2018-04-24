@@ -5,9 +5,11 @@ A knowledge beacon implementation for the Monarch Biolink API (https://api.monar
 ## Running with Docker
 
 ```shell
-docker build -t biolinkbeacon .
-docker run -p 8080:8080 biolinkbeacon
+docker build -t ncats:biolink .
+docker run -d --rm --name biolink -p 8080:8080 ncats:biolink
 ```
+
+This will run the Docker container named 'biolink' as a daemon.
 
 Navigate to http://localhost:8080/ui/ in your browser to see the Swagger UI
 
