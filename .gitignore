@@ -1,3 +1,7 @@
+server/predicates.json
+server/types.json
+server/kmap.json
+
 *~
 swagger*.jar
 # Byte-compiled / optimized / DLL files

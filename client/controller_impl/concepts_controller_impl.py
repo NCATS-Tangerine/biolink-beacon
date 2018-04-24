@@ -66,6 +66,8 @@ def get_concepts(keywords, types=None, pageNumber=None, pageSize=None):  # noqa:
         category = utils.sanitize_str(utils.get_property(d, 'category'))
         definition = utils.sanitize_str(utils.get_property(d, 'definition'))
 
+        definition = '' if definition == 'None' else definition
+
         concept = BeaconConcept(
             id=utils.get_property(d, 'id'),
             name=name,
