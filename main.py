@@ -31,6 +31,8 @@ from ontobio.golr.golr_query import GolrSearchQuery
 from ontobio.golr.golr_query import GolrAssociationQuery
 from ontobio.config import session
 
+from .biolink import BiolinkTerm 
+
 # Set absolute path of configuration file
 import os
 abspath = os.path.abspath(os.path.dirname(__file__))
@@ -77,7 +79,7 @@ def get_concepts():
 @app.route('/concepts/<string:conceptId>')
 def get_concept_details(conceptId):
     
-    if conceptId.startswith("biolink"):
+    if BiolinkTerm.isCurie(conceptId):
         conceptId = objectId(conceptId)
     
     results = GolrSearchQuery(
@@ -109,7 +111,7 @@ def get_concept_details(conceptId):
 
 def get_concept(conceptId):
     
-    if conceptId.startswith("biolink"):
+    if BiolinkTerm.isCurie(conceptId):
         conceptId = objectId(conceptId)
     
     results = GolrSearchQuery(
@@ -182,7 +184,7 @@ def get_statements():
         try:
             statement = {}
 
-            statement['id'] = 'biolink:' + d['id'] # add the biolink: prefix to statement id's
+            statement['id'] = BiolinkTerm.prefix()+":"+ d['id'] # add the Biolink prefix to statement id's
             
             statement['object'] = {k1 : d['object'][k2] for k1, k2 in key_pairs.items() }
             statement['object'] = get_concept(statement['object']['id'])
@@ -203,8 +205,8 @@ def get_statements():
 @app.route('/evidence/<string:statementId>')
 def get_evidence(statementId):
     
-    if statementId.startswith('biolink:'):
-        statementId = statementId[8:]
+    if statementId.startswith(BiolinkTerm.prefix()): 
+        statementId = BiolinkTerm.getCurieObjectId(statementId)
         
     evidences = []
 
@@ -294,7 +296,7 @@ def get_predicates():
 
     relations = facet_counts['relation']
 
-    return jsonify([{'id' : "biolink:"+c, 'name' : c, 'definition' : None} for key in relations])
+    return jsonify([{'id' : BiolinkTerm(c).curie(), 'name' : c, 'definition' : None} for key in relations])
     """
     # Not yet implemented... don't really know how
     return jsonify([])

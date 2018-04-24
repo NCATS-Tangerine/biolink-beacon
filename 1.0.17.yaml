@@ -61,11 +61,11 @@ paths:
             Successful response with types and frequency returned
           examples:
             application/json:
-              - id: 'biolink:gene'
+              - id: 'BLM:gene'
                 iri: 'http://bioentity.io/vocab/Gene'
                 label: gene
-                frequency: 12355
-              - id: 'biolink:cell'
+                frequency: 12355 
+              - id: 'BLM:cell'
                 iri: 'http://bioentity.io/vocab/Cell'
                 label: cell
                 frequency: 1234

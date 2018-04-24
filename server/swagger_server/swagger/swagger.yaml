@@ -42,11 +42,11 @@ paths:
               $ref: "#/definitions/BeaconConceptType"
           examples:
             application/json:
-            - id: "biolink:gene"
+            - id: "BLM:gene"
               iri: "http://bioentity.io/vocab/Gene"
               label: "gene"
               frequency: 12355
-            - id: "biolink:cell"
+            - id: "BLM:cell"
               iri: "http://bioentity.io/vocab/Cell"
               label: "cell"
               frequency: 1234

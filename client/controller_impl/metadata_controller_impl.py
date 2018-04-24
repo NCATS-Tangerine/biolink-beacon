@@ -9,6 +9,7 @@ from swagger_server.models.beacon_knowledge_map_predicate import BeaconKnowledge
 from swagger_server.models.beacon_concept_type import BeaconConceptType
 
 from controller_impl import utils
+from controller_impl.biolink import BiolinkTerm
 
 _MONARCH_PREFIX_URI='https://api.monarchinitiative.org/api/identifier/prefixes/'
 _baseIri = 'https://biolink.github.io/biolink-model/docs/{}.html'
@@ -49,11 +50,14 @@ def get_concept_types():  # noqa: E501
 	types = []
 
 	for category in counts:
+		term = BiolinkTerm(category)
+
+		iri = term.uri()
 		types.append({
 			'id' : 'biolink:' + category,
 			'label' : category,
 			'frequency' : counts[category],
-			'iri' : _baseIri.format(toCamelCase(category))
+			'iri' : iri
 		})
 
 	utils.save(types, _TYPES)
