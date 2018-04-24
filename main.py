@@ -182,7 +182,7 @@ def get_statements():
         try:
             statement = {}
 
-            statement['id'] = 'biolink:' + d['id'] # add the biolink: prefix to statement id's
+            statement['id'] = 'BLM:' + d['id'] # add the BLM: prefix to statement id's
             
             statement['object'] = {k1 : d['object'][k2] for k1, k2 in key_pairs.items() }
             statement['object'] = get_concept(statement['object']['id'])
@@ -203,7 +203,8 @@ def get_statements():
 @app.route('/evidence/<string:statementId>')
 def get_evidence(statementId):
     
-    if statementId.startswith('biolink:'):
+    if statementId.startswith('BLM:'): 
+
         statementId = statementId[8:]
         
     evidences = []
@@ -294,7 +295,7 @@ def get_predicates():
 
     relations = facet_counts['relation']
 
-    return jsonify([{'id' : "biolink:"+c, 'name' : c, 'definition' : None} for key in relations])
+    return jsonify([{'id' : "BLM:"+c, 'name' : c, 'definition' : None} for key in relations])
     """
     # Not yet implemented... don't really know how
     return jsonify([])

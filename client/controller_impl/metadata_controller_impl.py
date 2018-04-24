@@ -42,7 +42,7 @@ def get_concept_types():  # noqa: E501
 		iri = baseIri.format(toCamelCase(category))
 
 		summary = BeaconConceptType(
-			id='biolink:' + category,
+			id='BLM:' + category,
 			label=category,
 			frequency=counts[category],
 			iri=iri
