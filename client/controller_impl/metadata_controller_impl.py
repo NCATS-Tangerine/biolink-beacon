@@ -12,7 +12,6 @@ from controller_impl import utils
 from controller_impl.biolink import BiolinkTerm
 
 _MONARCH_PREFIX_URI='https://api.monarchinitiative.org/api/identifier/prefixes/'
-_baseIri = 'https://biolink.github.io/biolink-model/docs/{}.html'
 
 _TYPES='types.json'
 _KMAP='kmap.json'
@@ -52,20 +51,16 @@ def get_concept_types():  # noqa: E501
 	for category in counts:
 		term = BiolinkTerm(category)
 
-		iri = term.uri()
 		types.append({
-			'id' : 'biolink:' + category,
+			'id' : term.curie(),
 			'label' : category,
 			'frequency' : counts[category],
-			'iri' : iri
+			'iri' : term.uri()
 		})
 
 	utils.save(types, _TYPES)
 
 	return [dictToType(d) for d in types]
-
-def toCamelCase(s):
-	return ''.join(s.title().split(' '))
 
 def dictToKmap(d):
 	map_object = BeaconKnowledgeMapObject(
