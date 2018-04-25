@@ -1,0 +1,6 @@
+eclipse.preferences.version=1
+encoding//server/swagger_server/models/beacon_knowledge_map_object.py=utf-8
+encoding//server/swagger_server/models/beacon_knowledge_map_predicate.py=utf-8
+encoding//server/swagger_server/models/beacon_knowledge_map_statement.py=utf-8
+encoding//server/swagger_server/models/beacon_statement.py=utf-8
+encoding//server/swagger_server/models/beacon_statement_object.py=utf-8
