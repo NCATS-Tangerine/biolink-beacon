@@ -23,11 +23,13 @@ def get_concept_details(conceptId):  # noqa: E501
 
     json_response = {k : v for k, v in json_response.items() if v is not None}
 
+    synonyms = [d.get('val') for d in json_response.get('synonyms', []) if d.get('val') != None]
+
     concept = BeaconConceptWithDetails(
         id=json_response.get('id', None),
         name=json_response.get('label', None),
         type=' '.join(json_response.get('categories', [])),
-        synonyms=json_response.get('synonyms', [])
+        synonyms=synonyms
     )
 
     return [concept]
