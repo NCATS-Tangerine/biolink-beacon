@@ -83,7 +83,7 @@ def dictToKmap(d):
 		object=map_object,
 		predicate=map_predicate,
 		frequency=d['count'],
-		description=''
+		description=map_subject.type()+" "+map_predicate.name()+" "+map_object.type()
 	)
 
 	return map_statement
