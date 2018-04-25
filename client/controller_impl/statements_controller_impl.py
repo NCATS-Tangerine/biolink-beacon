@@ -46,7 +46,7 @@ def get_statements(s, relations=None, t=None, keywords=None, types=None, pageNum
         rows=pageSize
     )
 
-    results = utils.try_multi(method=g.exec, times=5, default_value={})
+    results = utils.try_multi(method=g.exec)
 
     associations = results['associations']
 

@@ -38,7 +38,7 @@ def get_concept_types():  # noqa: E501
 		rows=0
 	)
 
-	results = utils.try_multi(method=g.exec, times=5, default_value={})
+	results = utils.try_multi(method=g.exec)
 
 	object_category = results['facet_counts']['object_category']
 	subject_category = results['facet_counts']['subject_category']
@@ -110,7 +110,7 @@ def get_knowledge_map():
 		rows=0
 	)
 
-	results = g.exec()
+	results = utils.try_multi(method=g.exec)
 	facet_pivot = results['facet_pivot']
 
 	pivot_str = ','.join(pivots)

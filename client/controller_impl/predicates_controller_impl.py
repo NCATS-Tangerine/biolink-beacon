@@ -25,7 +25,8 @@ def get_predicates():
 		rows=0
 	)
 
-	results = g.exec()
+	results = utils.try_multi(g.exec)
+
 	facet_pivot = results['facet_pivot']
 
 	predicates = []

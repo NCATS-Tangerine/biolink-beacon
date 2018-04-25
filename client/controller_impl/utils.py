@@ -101,7 +101,7 @@ def sanitize_int(i, default_value=1):
     """
     return i if isinstance(i, int) and i > 0 else default_value
 
-def try_multi(method, repeats=5, default_value=None, **kwargs):
+def try_multi(method, repeats=5, **kwargs):
     """
     Will attempt to call method a number of times, returning the
     results if successful.
@@ -111,4 +111,5 @@ def try_multi(method, repeats=5, default_value=None, **kwargs):
             return method(**kwargs)
         except Exception as e:
             pass
-    return default_value
+
+    raise Exception('Tried to call ' + method.__name__ + ' ' + repeats + ' many times and failed')
