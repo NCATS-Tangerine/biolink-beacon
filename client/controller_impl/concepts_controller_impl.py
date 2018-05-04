@@ -28,7 +28,7 @@ def get_concept_details(conceptId):  # noqa: E501
     concept = BeaconConceptWithDetails(
         id=json_response.get('id', None),
         name=json_response.get('label', None),
-        type=' '.join(json_response.get('categories', [])),
+        type=', '.join(json_response.get('categories', [])),
         synonyms=synonyms
     )
 
