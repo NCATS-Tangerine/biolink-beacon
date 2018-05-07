@@ -25,10 +25,12 @@ def get_concept_details(conceptId):  # noqa: E501
 
     synonyms = [d.get('val') for d in json_response.get('synonyms', []) if d.get('val') != None]
 
+    categories = [utils.map_category(c) for c in json_response.get('categories', [])]
+
     concept = BeaconConceptWithDetails(
         id=json_response.get('id', None),
         name=json_response.get('label', None),
-        type=' '.join(json_response.get('categories', [])),
+        type=', '.join(categories),
         synonyms=synonyms
     )
 
@@ -52,6 +54,9 @@ def get_concepts(keywords, types=None, pageNumber=None, pageSize=None):  # noqa:
     :rtype: List[BeaconConcept]
     """
 
+    if types is not None:
+        types = [utils.map_category(t) for t in types]
+
     json_response = requests.get(
         utils.base_path() + 'search/entity/' + ' '.join(keywords),
         params={
@@ -64,17 +69,27 @@ def get_concepts(keywords, types=None, pageNumber=None, pageSize=None):  # noqa:
     concepts = []
 
     for d in json_response['docs']:
-        name = utils.sanitize_str(utils.get_property(d, 'label'))
-        category = utils.sanitize_str(utils.get_property(d, 'category'))
-        definition = utils.sanitize_str(utils.get_property(d, 'definition'))
+        category = utils.get_property(d, 'category')
 
+        if isinstance(category, list):
+            category = [utils.map_category(c) for c in category]
+        elif isinstance(category, str):
+            category = utils.map_category(category)
+
+        name = utils.sanitize_str(utils.get_property(d, 'label'))
+
+        category = utils.sanitize_str(category)
+
+        synonym = utils.get_property(d, 'synonym', [])
+
+        definition = utils.sanitize_str(utils.get_property(d, 'definition'))
         definition = '' if definition == 'None' else definition
 
         concept = BeaconConcept(
             id=utils.get_property(d, 'id'),
             name=name,
             type=category,
-            synonyms=utils.get_property(d, 'synonym', []),
+            synonyms=synonym,
             definition=definition
         )
 

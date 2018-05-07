@@ -1,6 +1,8 @@
 from controller_impl import utils
 from ontobio.golr.golr_query import GolrSearchQuery
 
+from cachetools.func import ttl_cache
+
 def get_exact_matches_to_concept(conceptId):  # noqa: E501
     """get_exact_matches_to_concept
 
@@ -29,6 +31,8 @@ def get_exact_matches_to_concept_list(c):  # noqa: E501
         s = s.union(exactmatches)
     return list(s)
 
+# ttl is "time to live" in seconds
+@ttl_cache(maxsize=300, ttl=120)
 def _get_exact_matches(conceptId):
     results = GolrSearchQuery(
         term=conceptId,
