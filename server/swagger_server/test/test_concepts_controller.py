@@ -7,6 +7,7 @@ from six import BytesIO
 
 from swagger_server.models.beacon_concept import BeaconConcept  # noqa: E501
 from swagger_server.models.beacon_concept_with_details import BeaconConceptWithDetails  # noqa: E501
+from swagger_server.models.exact_match_response import ExactMatchResponse  # noqa: E501
 from swagger_server.test import BaseTestCase
 
 
@@ -30,24 +31,12 @@ class TestConceptsController(BaseTestCase):
         
         """
         query_string = [('keywords', 'keywords_example'),
-                        ('types', 'types_example'),
-                        ('pageNumber', 56),
-                        ('pageSize', 56)]
+                        ('categories', 'categories_example'),
+                        ('size', 56)]
         response = self.client.open(
             '//concepts',
             method='GET',
             query_string=query_string)
-        self.assert200(response,
-                       'Response body is : ' + response.data.decode('utf-8'))
-
-    def test_get_exact_matches_to_concept(self):
-        """Test case for get_exact_matches_to_concept
-
-        
-        """
-        response = self.client.open(
-            '//exactmatches/{conceptId}'.format(conceptId='conceptId_example'),
-            method='GET')
         self.assert200(response,
                        'Response body is : ' + response.data.decode('utf-8'))
 

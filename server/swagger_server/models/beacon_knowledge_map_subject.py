@@ -15,25 +15,25 @@ class BeaconKnowledgeMapSubject(Model):
     Do not edit the class manually.
     """
 
-    def __init__(self, type: str=None, prefixes: List[str]=None):  # noqa: E501
+    def __init__(self, category: str=None, prefixes: List[str]=None):  # noqa: E501
         """BeaconKnowledgeMapSubject - a model defined in Swagger
 
-        :param type: The type of this BeaconKnowledgeMapSubject.  # noqa: E501
-        :type type: str
+        :param category: The category of this BeaconKnowledgeMapSubject.  # noqa: E501
+        :type category: str
         :param prefixes: The prefixes of this BeaconKnowledgeMapSubject.  # noqa: E501
         :type prefixes: List[str]
         """
         self.swagger_types = {
-            'type': str,
+            'category': str,
             'prefixes': List[str]
         }
 
         self.attribute_map = {
-            'type': 'type',
+            'category': 'category',
             'prefixes': 'prefixes'
         }
 
-        self._type = type
+        self._category = category
         self._prefixes = prefixes
 
     @classmethod
@@ -48,27 +48,27 @@ class BeaconKnowledgeMapSubject(Model):
         return util.deserialize_model(dikt, cls)
 
     @property
-    def type(self) -> str:
-        """Gets the type of this BeaconKnowledgeMapSubject.
+    def category(self) -> str:
+        """Gets the category of this BeaconKnowledgeMapSubject.
 
-        the concept semantic type of a statement subject   # noqa: E501
+        the concept semantic type of a statement subject. This  should be specified as Biolink concept semantic type names  like gene, pathway, etc. (see [Biolink Model](https://biolink.github.io/biolink-model) for the full list of terms)   # noqa: E501
 
-        :return: The type of this BeaconKnowledgeMapSubject.
+        :return: The category of this BeaconKnowledgeMapSubject.
         :rtype: str
         """
-        return self._type
+        return self._category
 
-    @type.setter
-    def type(self, type: str):
-        """Sets the type of this BeaconKnowledgeMapSubject.
+    @category.setter
+    def category(self, category: str):
+        """Sets the category of this BeaconKnowledgeMapSubject.
 
-        the concept semantic type of a statement subject   # noqa: E501
+        the concept semantic type of a statement subject. This  should be specified as Biolink concept semantic type names  like gene, pathway, etc. (see [Biolink Model](https://biolink.github.io/biolink-model) for the full list of terms)   # noqa: E501
 
-        :param type: The type of this BeaconKnowledgeMapSubject.
-        :type type: str
+        :param category: The category of this BeaconKnowledgeMapSubject.
+        :type category: str
         """
 
-        self._type = type
+        self._category = category
 
     @property
     def prefixes(self) -> List[str]:

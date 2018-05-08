@@ -19,8 +19,7 @@ class TestStatementsController(BaseTestCase):
         
         """
         query_string = [('keywords', 'keywords_example'),
-                        ('pageNumber', 56),
-                        ('pageSize', 56)]
+                        ('size', 56)]
         response = self.client.open(
             '//evidence/{statementId}'.format(statementId='statementId_example'),
             method='GET',
@@ -37,9 +36,8 @@ class TestStatementsController(BaseTestCase):
                         ('relations', 'relations_example'),
                         ('t', 't_example'),
                         ('keywords', 'keywords_example'),
-                        ('types', 'types_example'),
-                        ('pageNumber', 56),
-                        ('pageSize', 56)]
+                        ('categories', 'categories_example'),
+                        ('size', 56)]
         response = self.client.open(
             '//statements',
             method='GET',
