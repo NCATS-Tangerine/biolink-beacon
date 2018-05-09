@@ -16,15 +16,15 @@ class BeaconConceptWithDetails(Model):
     Do not edit the class manually.
     """
 
-    def __init__(self, id: str=None, name: str=None, type: str=None, synonyms: List[str]=None, definition: str=None, details: List[BeaconConceptDetail]=None):  # noqa: E501
+    def __init__(self, id: str=None, name: str=None, category: str=None, synonyms: List[str]=None, definition: str=None, details: List[BeaconConceptDetail]=None):  # noqa: E501
         """BeaconConceptWithDetails - a model defined in Swagger
 
         :param id: The id of this BeaconConceptWithDetails.  # noqa: E501
         :type id: str
         :param name: The name of this BeaconConceptWithDetails.  # noqa: E501
         :type name: str
-        :param type: The type of this BeaconConceptWithDetails.  # noqa: E501
-        :type type: str
+        :param category: The category of this BeaconConceptWithDetails.  # noqa: E501
+        :type category: str
         :param synonyms: The synonyms of this BeaconConceptWithDetails.  # noqa: E501
         :type synonyms: List[str]
         :param definition: The definition of this BeaconConceptWithDetails.  # noqa: E501
@@ -35,7 +35,7 @@ class BeaconConceptWithDetails(Model):
         self.swagger_types = {
             'id': str,
             'name': str,
-            'type': str,
+            'category': str,
             'synonyms': List[str],
             'definition': str,
             'details': List[BeaconConceptDetail]
@@ -44,7 +44,7 @@ class BeaconConceptWithDetails(Model):
         self.attribute_map = {
             'id': 'id',
             'name': 'name',
-            'type': 'type',
+            'category': 'category',
             'synonyms': 'synonyms',
             'definition': 'definition',
             'details': 'details'
@@ -52,7 +52,7 @@ class BeaconConceptWithDetails(Model):
 
         self._id = id
         self._name = name
-        self._type = type
+        self._category = category
         self._synonyms = synonyms
         self._definition = definition
         self._details = details
@@ -115,27 +115,27 @@ class BeaconConceptWithDetails(Model):
         self._name = name
 
     @property
-    def type(self) -> str:
-        """Gets the type of this BeaconConceptWithDetails.
+    def category(self) -> str:
+        """Gets the category of this BeaconConceptWithDetails.
 
         concept semantic type   # noqa: E501
 
-        :return: The type of this BeaconConceptWithDetails.
+        :return: The category of this BeaconConceptWithDetails.
         :rtype: str
         """
-        return self._type
+        return self._category
 
-    @type.setter
-    def type(self, type: str):
-        """Sets the type of this BeaconConceptWithDetails.
+    @category.setter
+    def category(self, category: str):
+        """Sets the category of this BeaconConceptWithDetails.
 
         concept semantic type   # noqa: E501
 
-        :param type: The type of this BeaconConceptWithDetails.
-        :type type: str
+        :param category: The category of this BeaconConceptWithDetails.
+        :type category: str
         """
 
-        self._type = type
+        self._category = category
 
     @property
     def synonyms(self) -> List[str]:

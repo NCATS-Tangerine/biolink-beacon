@@ -2,55 +2,22 @@ import json
 
 from datetime import date, timedelta
 
-def save(d, file_name):
+def map_category(category):
     """
-    Saves d to a file, stamping it with the day.
-
-    Parameters
-    ----------
-    d : a JSON serializable object, either a dict or list of dicts and lists and primitives.
-    file_name : string
+    Monarch's categories don't perfectly map onto the biolink model
+    https://github.com/biolink/biolink-model/issues/62
     """
-    obj = {
-        'date' : {
-            'year' : date.today().year,
-            'month' : date.today().month,
-            'day' : date.today().day
-        },
-        'data' : d
-    }
-
-    with open(file_name, 'w') as f:
-        json.dump(obj, f)
-
-def load(file_name, max_days_old=3):
-    """
-    Attempts to load an object saved with save(d, file_name)
-
-    Parameters
-    ----------
-    file_name : string
-    max_days_old :
-        the maximum number of days before which the data will not be
-        retreived.
-    """
-    try:
-        with open(file_name, 'r') as f:
-            obj = json.load(f)
-            d = obj['date']
-            saved_date = date(d['year'], d['month'], d['day'])
-
-            if date.today() - saved_date > timedelta(days=max_days_old):
-                return None
-            else:
-                return obj['data']
-
-    except FileNotFoundError:
-        return None
+    return {
+        'variant' : 'sequence variant',
+        'phenotype' : 'phenotypic feature',
+        'sequence variant' : 'variant',
+        'phenotypic feature' : 'phenotype',
+        # 'model' : 'model to disease mixin'
+    }.get(category.lower(), category)
 
 def base_path():
-    # return 'https://api.monarchinitiative.org/api/'
-    return 'https://owlsim.monarchinitiative.org/api/'
+    return 'https://api.monarchinitiative.org/api/'
+    # return 'https://owlsim.monarchinitiative.org/api/'
 
 def biolink_prefix():
     """
@@ -88,12 +55,10 @@ def sanitize_str(s):
     Ensures that s is a string. If it's a list or tuple then it joins the items
     into a string deliminated by a space.
     """
-    if isinstance(s, (list, tuple)):
-        return ' '.join([sanitize_str(x) for x in s])
-    elif isinstance(s, str):
-        return s
+    if isinstance(s, (list, tuple, set)):
+        return ', '.join([sanitize_str(x) for x in s])
     else:
-        return str(s)
+        return s
 
 def sanitize_int(i, default_value=1):
     """

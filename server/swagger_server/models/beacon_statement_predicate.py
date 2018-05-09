@@ -15,26 +15,26 @@ class BeaconStatementPredicate(Model):
     Do not edit the class manually.
     """
 
-    def __init__(self, id: str=None, name: str=None):  # noqa: E501
+    def __init__(self, edge_label: str=None, relation: str=None):  # noqa: E501
         """BeaconStatementPredicate - a model defined in Swagger
 
-        :param id: The id of this BeaconStatementPredicate.  # noqa: E501
-        :type id: str
-        :param name: The name of this BeaconStatementPredicate.  # noqa: E501
-        :type name: str
+        :param edge_label: The edge_label of this BeaconStatementPredicate.  # noqa: E501
+        :type edge_label: str
+        :param relation: The relation of this BeaconStatementPredicate.  # noqa: E501
+        :type relation: str
         """
         self.swagger_types = {
-            'id': str,
-            'name': str
+            'edge_label': str,
+            'relation': str
         }
 
         self.attribute_map = {
-            'id': 'id',
-            'name': 'name'
+            'edge_label': 'edge_label',
+            'relation': 'relation'
         }
 
-        self._id = id
-        self._name = name
+        self._edge_label = edge_label
+        self._relation = relation
 
     @classmethod
     def from_dict(cls, dikt) -> 'BeaconStatementPredicate':
@@ -48,47 +48,47 @@ class BeaconStatementPredicate(Model):
         return util.deserialize_model(dikt, cls)
 
     @property
-    def id(self) -> str:
-        """Gets the id of this BeaconStatementPredicate.
+    def edge_label(self) -> str:
+        """Gets the edge_label of this BeaconStatementPredicate.
 
-        CURIE-encoded identifier of predicate resource   # noqa: E501
+        minimal Biolink model predicate term  # noqa: E501
 
-        :return: The id of this BeaconStatementPredicate.
+        :return: The edge_label of this BeaconStatementPredicate.
         :rtype: str
         """
-        return self._id
+        return self._edge_label
 
-    @id.setter
-    def id(self, id: str):
-        """Sets the id of this BeaconStatementPredicate.
+    @edge_label.setter
+    def edge_label(self, edge_label: str):
+        """Sets the edge_label of this BeaconStatementPredicate.
 
-        CURIE-encoded identifier of predicate resource   # noqa: E501
+        minimal Biolink model predicate term  # noqa: E501
 
-        :param id: The id of this BeaconStatementPredicate.
-        :type id: str
+        :param edge_label: The edge_label of this BeaconStatementPredicate.
+        :type edge_label: str
         """
 
-        self._id = id
+        self._edge_label = edge_label
 
     @property
-    def name(self) -> str:
-        """Gets the name of this BeaconStatementPredicate.
+    def relation(self) -> str:
+        """Gets the relation of this BeaconStatementPredicate.
 
-        human readable label of concept  # noqa: E501
+        SHOULD be from maximal Biolink model predicate list, but beacon-specific extensions allowed. Preferred format is a CURIE, where one exists, but strings/labels acceptable. May be empty.  # noqa: E501
 
-        :return: The name of this BeaconStatementPredicate.
+        :return: The relation of this BeaconStatementPredicate.
         :rtype: str
         """
-        return self._name
+        return self._relation
 
-    @name.setter
-    def name(self, name: str):
-        """Sets the name of this BeaconStatementPredicate.
+    @relation.setter
+    def relation(self, relation: str):
+        """Sets the relation of this BeaconStatementPredicate.
 
-        human readable label of concept  # noqa: E501
+        SHOULD be from maximal Biolink model predicate list, but beacon-specific extensions allowed. Preferred format is a CURIE, where one exists, but strings/labels acceptable. May be empty.  # noqa: E501
 
-        :param name: The name of this BeaconStatementPredicate.
-        :type name: str
+        :param relation: The relation of this BeaconStatementPredicate.
+        :type relation: str
         """
 
-        self._name = name
+        self._relation = relation

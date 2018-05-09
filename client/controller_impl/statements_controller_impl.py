@@ -32,9 +32,8 @@ def get_statements(s, relations=None, t=None, keywords=None, types=None, pageNum
     pageNumber = utils.sanitize_int(pageNumber)
     pageSize = utils.sanitize_int(pageSize, 5)
 
-    keywords = keywords.split(' ') if keywords != None else None
-    types = types.split(' ') if types != None else None
-    relations = relations.split(' ') if relations != None else None
+    if types is not None:
+        types = [utils.map_category(t) for t in types]
 
     g = BeaconAssociationQuery(
     	sources=s,
@@ -57,21 +56,35 @@ def get_statements(s, relations=None, t=None, keywords=None, types=None, pageNum
         _object = d['object']
         _relation = d['relation']
 
+        if _subject is None or _object is None or _relation is None:
+            continue
+
+        subject_categories = _subject['categories']
+        object_categories = _object['categories']
+
+        if isinstance(subject_categories, list):
+            subject_categories = [utils.map_category(c) for c in subject_categories]
+
+        if isinstance(object_categories, list):
+            object_categories = [utils.map_category(c) for c in object_categories]
+
         statement_subject = BeaconStatementSubject(
             id=_subject['id'],
             name=_subject['label'],
-            type=' '.join(_subject['categories'])
+            category=', '.join(subject_categories)
         )
 
         statement_object = BeaconStatementObject(
             id=_object['id'],
             name=_object['label'],
-            type=' '.join(_object['categories'])
+            category=', '.join(object_categories)
         )
 
+        edge_label = '_'.join(_relation['label'].split(' '))
+
         statement_predicate = BeaconStatementPredicate(
-            id=_relation['id'],
-            name=_relation['label']
+            relation=_relation['id'],
+            edge_label=edge_label
         )
 
         identifier = d['id']

@@ -1,10 +1,13 @@
 from ontobio.golr.golr_query import GolrAssociationQuery, M
 from swagger_server.models.beacon_predicate import BeaconPredicate
 
+from cachetools.func import ttl_cache
+
 from controller_impl import utils
 
-_PREDICATES='predicates.json'
+__time_to_live_in_seconds = 604800
 
+@ttl_cache(maxsize=500, ttl=__time_to_live_in_seconds)
 def get_predicates():
 	"""get_predicates
 
@@ -13,10 +16,6 @@ def get_predicates():
 
 	:rtype: List[Predicate]
 	"""
-
-	cached_predicates = utils.load(_PREDICATES)
-	if cached_predicates != None:
-		return [dictToPredicate(d) for d in cached_predicates]
 
 	g = GolrAssociationQuery(
 		q='*:*',
@@ -38,15 +37,8 @@ def get_predicates():
 			# not currently used
 			count = pivot['count']
 
-			predicates.append({
-				'id' : identifier,
-				'name' : name,
-				'count' : count
-			})
+			p = BeaconPredicate(id=identifier, name=name, definition=None)
 
-	utils.save(predicates, _PREDICATES)
+			predicates.append(p)
 
-	return [dictToPredicate(d) for d in predicates]
-
-def dictToPredicate(d):
-	return BeaconPredicate(id=d['id'], name=d['name'], definition=None)
+	return predicates

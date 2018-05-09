@@ -15,26 +15,21 @@ class BeaconKnowledgeMapPredicate(Model):
     Do not edit the class manually.
     """
 
-    def __init__(self, id: str=None, name: str=None):  # noqa: E501
+    def __init__(self, relation: str=None):  # noqa: E501
         """BeaconKnowledgeMapPredicate - a model defined in Swagger
 
-        :param id: The id of this BeaconKnowledgeMapPredicate.  # noqa: E501
-        :type id: str
-        :param name: The name of this BeaconKnowledgeMapPredicate.  # noqa: E501
-        :type name: str
+        :param relation: The relation of this BeaconKnowledgeMapPredicate.  # noqa: E501
+        :type relation: str
         """
         self.swagger_types = {
-            'id': str,
-            'name': str
+            'relation': str
         }
 
         self.attribute_map = {
-            'id': 'id',
-            'name': 'name'
+            'relation': 'relation'
         }
 
-        self._id = id
-        self._name = name
+        self._relation = relation
 
     @classmethod
     def from_dict(cls, dikt) -> 'BeaconKnowledgeMapPredicate':
@@ -48,47 +43,24 @@ class BeaconKnowledgeMapPredicate(Model):
         return util.deserialize_model(dikt, cls)
 
     @property
-    def id(self) -> str:
-        """Gets the id of this BeaconKnowledgeMapPredicate.
+    def relation(self) -> str:
+        """Gets the relation of this BeaconKnowledgeMapPredicate.
 
-        CURIE of the predicate of the given relationship  # noqa: E501
+        Human readable name of the maximal given predicate relation. This should be specified as Biolink predicate names like  gene_associated_with_condition. See [Biolink Model](https://biolink.github.io/biolink-model) for the full list of terms   # noqa: E501
 
-        :return: The id of this BeaconKnowledgeMapPredicate.
+        :return: The relation of this BeaconKnowledgeMapPredicate.
         :rtype: str
         """
-        return self._id
+        return self._relation
 
-    @id.setter
-    def id(self, id: str):
-        """Sets the id of this BeaconKnowledgeMapPredicate.
+    @relation.setter
+    def relation(self, relation: str):
+        """Sets the relation of this BeaconKnowledgeMapPredicate.
 
-        CURIE of the predicate of the given relationship  # noqa: E501
+        Human readable name of the maximal given predicate relation. This should be specified as Biolink predicate names like  gene_associated_with_condition. See [Biolink Model](https://biolink.github.io/biolink-model) for the full list of terms   # noqa: E501
 
-        :param id: The id of this BeaconKnowledgeMapPredicate.
-        :type id: str
+        :param relation: The relation of this BeaconKnowledgeMapPredicate.
+        :type relation: str
         """
 
-        self._id = id
-
-    @property
-    def name(self) -> str:
-        """Gets the name of this BeaconKnowledgeMapPredicate.
-
-        human readable name of the given relationship predicate  # noqa: E501
-
-        :return: The name of this BeaconKnowledgeMapPredicate.
-        :rtype: str
-        """
-        return self._name
-
-    @name.setter
-    def name(self, name: str):
-        """Sets the name of this BeaconKnowledgeMapPredicate.
-
-        human readable name of the given relationship predicate  # noqa: E501
-
-        :param name: The name of this BeaconKnowledgeMapPredicate.
-        :type name: str
-        """
-
-        self._name = name
+        self._relation = relation

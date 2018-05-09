@@ -15,31 +15,61 @@ class BeaconPredicate(Model):
     Do not edit the class manually.
     """
 
-    def __init__(self, id: str=None, name: str=None, definition: str=None):  # noqa: E501
+    def __init__(self, id: str=None, uri: str=None, edge_label: str=None, relation: str=None, local_id: str=None, local_uri: str=None, local_relation: str=None, description: str=None, frequency: int=None):  # noqa: E501
         """BeaconPredicate - a model defined in Swagger
 
         :param id: The id of this BeaconPredicate.  # noqa: E501
         :type id: str
-        :param name: The name of this BeaconPredicate.  # noqa: E501
-        :type name: str
-        :param definition: The definition of this BeaconPredicate.  # noqa: E501
-        :type definition: str
+        :param uri: The uri of this BeaconPredicate.  # noqa: E501
+        :type uri: str
+        :param edge_label: The edge_label of this BeaconPredicate.  # noqa: E501
+        :type edge_label: str
+        :param relation: The relation of this BeaconPredicate.  # noqa: E501
+        :type relation: str
+        :param local_id: The local_id of this BeaconPredicate.  # noqa: E501
+        :type local_id: str
+        :param local_uri: The local_uri of this BeaconPredicate.  # noqa: E501
+        :type local_uri: str
+        :param local_relation: The local_relation of this BeaconPredicate.  # noqa: E501
+        :type local_relation: str
+        :param description: The description of this BeaconPredicate.  # noqa: E501
+        :type description: str
+        :param frequency: The frequency of this BeaconPredicate.  # noqa: E501
+        :type frequency: int
         """
         self.swagger_types = {
             'id': str,
-            'name': str,
-            'definition': str
+            'uri': str,
+            'edge_label': str,
+            'relation': str,
+            'local_id': str,
+            'local_uri': str,
+            'local_relation': str,
+            'description': str,
+            'frequency': int
         }
 
         self.attribute_map = {
             'id': 'id',
-            'name': 'name',
-            'definition': 'definition'
+            'uri': 'uri',
+            'edge_label': 'edge_label',
+            'relation': 'relation',
+            'local_id': 'local_id',
+            'local_uri': 'local_uri',
+            'local_relation': 'local_relation',
+            'description': 'description',
+            'frequency': 'frequency'
         }
 
         self._id = id
-        self._name = name
-        self._definition = definition
+        self._uri = uri
+        self._edge_label = edge_label
+        self._relation = relation
+        self._local_id = local_id
+        self._local_uri = local_uri
+        self._local_relation = local_relation
+        self._description = description
+        self._frequency = frequency
 
     @classmethod
     def from_dict(cls, dikt) -> 'BeaconPredicate':
@@ -56,7 +86,7 @@ class BeaconPredicate(Model):
     def id(self) -> str:
         """Gets the id of this BeaconPredicate.
 
-        CURIE-encoded identifier of predicate resource   # noqa: E501
+        CURIE-encoded identifier of predicate relation   # noqa: E501
 
         :return: The id of this BeaconPredicate.
         :rtype: str
@@ -67,7 +97,7 @@ class BeaconPredicate(Model):
     def id(self, id: str):
         """Sets the id of this BeaconPredicate.
 
-        CURIE-encoded identifier of predicate resource   # noqa: E501
+        CURIE-encoded identifier of predicate relation   # noqa: E501
 
         :param id: The id of this BeaconPredicate.
         :type id: str
@@ -76,47 +106,185 @@ class BeaconPredicate(Model):
         self._id = id
 
     @property
-    def name(self) -> str:
-        """Gets the name of this BeaconPredicate.
+    def uri(self) -> str:
+        """Gets the uri of this BeaconPredicate.
 
-        human readable name of predicate relation   # noqa: E501
+        The predicate URI which should generally resolves to the  full semantic description of the predicate relation  # noqa: E501
 
-        :return: The name of this BeaconPredicate.
+        :return: The uri of this BeaconPredicate.
         :rtype: str
         """
-        return self._name
+        return self._uri
 
-    @name.setter
-    def name(self, name: str):
-        """Sets the name of this BeaconPredicate.
+    @uri.setter
+    def uri(self, uri: str):
+        """Sets the uri of this BeaconPredicate.
 
-        human readable name of predicate relation   # noqa: E501
+        The predicate URI which should generally resolves to the  full semantic description of the predicate relation  # noqa: E501
 
-        :param name: The name of this BeaconPredicate.
-        :type name: str
+        :param uri: The uri of this BeaconPredicate.
+        :type uri: str
         """
 
-        self._name = name
+        self._uri = uri
 
     @property
-    def definition(self) -> str:
-        """Gets the definition of this BeaconPredicate.
+    def edge_label(self) -> str:
+        """Gets the edge_label of this BeaconPredicate.
 
-        human readable definition of predicate relation provided by this beacon   # noqa: E501
+        human readable name of a 'minimal' Biolink model predicate relation terms (see [Biolink Model](https://biolink.github.io/biolink-model) for the full list of terms)   # noqa: E501
 
-        :return: The definition of this BeaconPredicate.
+        :return: The edge_label of this BeaconPredicate.
         :rtype: str
         """
-        return self._definition
+        return self._edge_label
 
-    @definition.setter
-    def definition(self, definition: str):
-        """Sets the definition of this BeaconPredicate.
+    @edge_label.setter
+    def edge_label(self, edge_label: str):
+        """Sets the edge_label of this BeaconPredicate.
 
-        human readable definition of predicate relation provided by this beacon   # noqa: E501
+        human readable name of a 'minimal' Biolink model predicate relation terms (see [Biolink Model](https://biolink.github.io/biolink-model) for the full list of terms)   # noqa: E501
 
-        :param definition: The definition of this BeaconPredicate.
-        :type definition: str
+        :param edge_label: The edge_label of this BeaconPredicate.
+        :type edge_label: str
         """
 
-        self._definition = definition
+        self._edge_label = edge_label
+
+    @property
+    def relation(self) -> str:
+        """Gets the relation of this BeaconPredicate.
+
+        human readable name of a 'maximal' Biolink model predicate relation terms (see [Biolink Model](https://biolink.github.io/biolink-model) for the full list of terms)   # noqa: E501
+
+        :return: The relation of this BeaconPredicate.
+        :rtype: str
+        """
+        return self._relation
+
+    @relation.setter
+    def relation(self, relation: str):
+        """Sets the relation of this BeaconPredicate.
+
+        human readable name of a 'maximal' Biolink model predicate relation terms (see [Biolink Model](https://biolink.github.io/biolink-model) for the full list of terms)   # noqa: E501
+
+        :param relation: The relation of this BeaconPredicate.
+        :type relation: str
+        """
+
+        self._relation = relation
+
+    @property
+    def local_id(self) -> str:
+        """Gets the local_id of this BeaconPredicate.
+
+        CURIE-encoded identifier of the locally defined predicate relation. Such terms should be formally documented as mappings in the  [Biolink Model](https://biolink.github.io/biolink-model)   # noqa: E501
+
+        :return: The local_id of this BeaconPredicate.
+        :rtype: str
+        """
+        return self._local_id
+
+    @local_id.setter
+    def local_id(self, local_id: str):
+        """Sets the local_id of this BeaconPredicate.
+
+        CURIE-encoded identifier of the locally defined predicate relation. Such terms should be formally documented as mappings in the  [Biolink Model](https://biolink.github.io/biolink-model)   # noqa: E501
+
+        :param local_id: The local_id of this BeaconPredicate.
+        :type local_id: str
+        """
+
+        self._local_id = local_id
+
+    @property
+    def local_uri(self) -> str:
+        """Gets the local_uri of this BeaconPredicate.
+
+        The predicate URI which should generally resolves  to the local predicate relation  # noqa: E501
+
+        :return: The local_uri of this BeaconPredicate.
+        :rtype: str
+        """
+        return self._local_uri
+
+    @local_uri.setter
+    def local_uri(self, local_uri: str):
+        """Sets the local_uri of this BeaconPredicate.
+
+        The predicate URI which should generally resolves  to the local predicate relation  # noqa: E501
+
+        :param local_uri: The local_uri of this BeaconPredicate.
+        :type local_uri: str
+        """
+
+        self._local_uri = local_uri
+
+    @property
+    def local_relation(self) -> str:
+        """Gets the local_relation of this BeaconPredicate.
+
+        human readable name of the locally defined predicate relation   # noqa: E501
+
+        :return: The local_relation of this BeaconPredicate.
+        :rtype: str
+        """
+        return self._local_relation
+
+    @local_relation.setter
+    def local_relation(self, local_relation: str):
+        """Sets the local_relation of this BeaconPredicate.
+
+        human readable name of the locally defined predicate relation   # noqa: E501
+
+        :param local_relation: The local_relation of this BeaconPredicate.
+        :type local_relation: str
+        """
+
+        self._local_relation = local_relation
+
+    @property
+    def description(self) -> str:
+        """Gets the description of this BeaconPredicate.
+
+        human readable definition of predicate relation  provided by this beacon   # noqa: E501
+
+        :return: The description of this BeaconPredicate.
+        :rtype: str
+        """
+        return self._description
+
+    @description.setter
+    def description(self, description: str):
+        """Sets the description of this BeaconPredicate.
+
+        human readable definition of predicate relation  provided by this beacon   # noqa: E501
+
+        :param description: The description of this BeaconPredicate.
+        :type description: str
+        """
+
+        self._description = description
+
+    @property
+    def frequency(self) -> int:
+        """Gets the frequency of this BeaconPredicate.
+
+        the number of statement entries using the specified predicate in the given beacon knowledge base  # noqa: E501
+
+        :return: The frequency of this BeaconPredicate.
+        :rtype: int
+        """
+        return self._frequency
+
+    @frequency.setter
+    def frequency(self, frequency: int):
+        """Sets the frequency of this BeaconPredicate.
+
+        the number of statement entries using the specified predicate in the given beacon knowledge base  # noqa: E501
+
+        :param frequency: The frequency of this BeaconPredicate.
+        :type frequency: int
+        """
+
+        self._frequency = frequency

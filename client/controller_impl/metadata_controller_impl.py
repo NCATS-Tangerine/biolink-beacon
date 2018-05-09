@@ -6,19 +6,17 @@ from swagger_server.models.beacon_knowledge_map_object import BeaconKnowledgeMap
 from swagger_server.models.beacon_knowledge_map_subject import BeaconKnowledgeMapSubject
 from swagger_server.models.beacon_knowledge_map_predicate import BeaconKnowledgeMapPredicate
 
-from swagger_server.models.beacon_concept_type import BeaconConceptType
+from swagger_server.models.beacon_concept_category import BeaconConceptCategory
 
+from cachetools.func import ttl_cache
 from controller_impl import utils
 from controller_impl.biolink import BiolinkTerm
 
 _MONARCH_PREFIX_URI='https://api.monarchinitiative.org/api/identifier/prefixes/'
 
-_TYPES='types.json'
-_KMAP='kmap.json'
+__time_to_live_in_seconds = 604800
 
-def dictToType(d):
-	return BeaconConceptType(id=d['id'], label=d['label'], frequency=d['frequency'], iri=d['iri'])
-
+@ttl_cache(maxsize=300, ttl=__time_to_live_in_seconds)
 def get_concept_types():  # noqa: E501
 	"""get_concept_types
 
@@ -27,10 +25,6 @@ def get_concept_types():  # noqa: E501
 
 	:rtype: List[BeaconConceptType]
 	"""
-
-	cached_types = utils.load(_TYPES)
-	if (cached_types != None):
-		return [dictToType(d) for d in cached_types]
 
 	g = GolrAssociationQuery(
 		q='*:*',
@@ -49,45 +43,19 @@ def get_concept_types():  # noqa: E501
 	types = []
 
 	for category in counts:
-		term = BiolinkTerm(category)
+		term = BiolinkTerm(utils.map_category(category))
+		_id = term.curie()
+		label = utils.map_category(category)
+		frequency = counts[category]
+		iri = term.uri()
 
-		types.append({
-			'id' : term.curie(),
-			'label' : category,
-			'frequency' : counts[category],
-			'iri' : term.uri()
-		})
+		t = BeaconConceptType(id=_id, label=label, frequency=frequency, iri=iri)
 
-	utils.save(types, _TYPES)
+		types.append(t)
 
-	return [dictToType(d) for d in types]
+	return types
 
-def dictToKmap(d):
-	map_object = BeaconKnowledgeMapObject(
-		type=d['object_category'],
-		prefixes=d['object_prefixes']
-	)
-
-	map_subject = BeaconKnowledgeMapSubject(
-		type=d['subject_category'],
-		prefixes=d['subject_prefixes']
-	)
-
-	map_predicate = BeaconKnowledgeMapPredicate(
-		id=d['relation_id'],
-		name=d['relation_label']
-	)
-
-	map_statement = BeaconKnowledgeMapStatement(
-		subject=map_subject,
-		object=map_object,
-		predicate=map_predicate,
-		frequency=d['count'],
-		description=map_subject.type+" "+map_predicate.name.replace("_"," ")+" "+map_object.type
-	)
-
-	return map_statement
-
+@ttl_cache(maxsize=300, ttl=__time_to_live_in_seconds)
 def get_knowledge_map():
 	"""get_knowledge_map
 
@@ -96,10 +64,6 @@ def get_knowledge_map():
 
 	:rtype: List[KnowledgeMapStatement]
 	"""
-
-	cached_kmaps = utils.load(_KMAP)
-	if cached_kmaps != None:
-		return [dictToKmap(d) for d in cached_kmaps]
 
 	pivots = [M.RELATION, M.RELATION_LABEL, M.OBJECT_CATEGORY, M.SUBJECT_CATEGORY]
 
@@ -124,9 +88,9 @@ def get_knowledge_map():
 		for p2 in p1['pivot']:
 			relation_label = p2['value']
 			for p3 in p2['pivot']:
-				object_category = p3['value']
+				object_category = utils.map_category(p3['value'])
 				for p4 in p3['pivot']:
-					subject_category = p4['value']
+					subject_category = utils.map_category(p4['value'])
 					count = p4['count']
 
 					object_prefixes=[]
@@ -139,19 +103,32 @@ def get_knowledge_map():
 							if object_category == category:
 								object_prefixes.append(prefix)
 
-					statements.append({
-						'object_category' : object_category,
-						'object_prefixes' : object_prefixes,
-						'subject_category' : subject_category,
-						'subject_prefixes' : subject_prefixes,
-						'relation_id' : relation_id,
-						'relation_label' : relation_label,
-						'count' : count
-					})
+					map_object = BeaconKnowledgeMapObject(
+						type=object_category,
+						prefixes=object_prefixes
+					)
 
-	utils.save(statements, _KMAP)
+					map_subject = BeaconKnowledgeMapSubject(
+						type=subject_category,
+						prefixes=subject_prefixes
+					)
 
-	return [dictToKmap(d) for d in statements]
+					map_predicate = BeaconKnowledgeMapPredicate(
+						id=relation_id,
+						name=relation_label
+					)
+
+					map_statement = BeaconKnowledgeMapStatement(
+						subject=map_subject,
+						object=map_object,
+						predicate=map_predicate,
+						frequency=count,
+						description=map_subject.type+" "+map_predicate.name.replace("_"," ")+" "+map_object.type
+					)
+
+					statements.append(map_statement)
+
+	return statements
 
 def __build_category_counts(d, counts=None):
 	if counts is None:
