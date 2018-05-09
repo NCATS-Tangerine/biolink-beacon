@@ -6,7 +6,7 @@ from swagger_server.models.beacon_knowledge_map_object import BeaconKnowledgeMap
 from swagger_server.models.beacon_knowledge_map_subject import BeaconKnowledgeMapSubject
 from swagger_server.models.beacon_knowledge_map_predicate import BeaconKnowledgeMapPredicate
 
-from swagger_server.models.beacon_concept_type import BeaconConceptType
+from swagger_server.models.beacon_concept_category import BeaconConceptCategory
 
 from cachetools.func import ttl_cache
 from controller_impl import utils

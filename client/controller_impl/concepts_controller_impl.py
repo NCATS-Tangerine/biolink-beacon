@@ -17,9 +17,12 @@ def get_concept_details(conceptId):  # noqa: E501
     :rtype: List[BeaconConceptWithDetails]
     """
 
-    json_response = requests.get(
-        utils.base_path() + 'bioentity/' + conceptId
-    ).json()
+    response = requests.get(utils.base_path() + 'bioentity/' + conceptId)
+
+    if response.status_code != 200:
+        raise Exception(response.url + " returned status code: " + str(response.status_code))
+
+    json_response = response.json()
 
     json_response = {k : v for k, v in json_response.items() if v is not None}
 
@@ -30,7 +33,7 @@ def get_concept_details(conceptId):  # noqa: E501
     concept = BeaconConceptWithDetails(
         id=json_response.get('id', None),
         name=json_response.get('label', None),
-        type=', '.join(categories),
+        category=', '.join(categories),
         synonyms=synonyms
     )
 
@@ -88,7 +91,7 @@ def get_concepts(keywords, types=None, pageNumber=None, pageSize=None):  # noqa:
         concept = BeaconConcept(
             id=utils.get_property(d, 'id'),
             name=name,
-            type=category,
+            category=category,
             synonyms=synonym,
             definition=definition
         )

@@ -1,19 +1,9 @@
 from controller_impl import utils
 from ontobio.golr.golr_query import GolrSearchQuery
 
+from swagger_server.models.exact_match_response import ExactMatchResponse
+
 from cachetools.func import ttl_cache
-
-def get_exact_matches_to_concept(conceptId):  # noqa: E501
-    """get_exact_matches_to_concept
-
-    Retrieves a list of qualified identifiers of \&quot;exact match\&quot; concepts, [sensa SKOS](http://www.w3.org/2004/02/skos/core#exactMatch) associated with a specified (url-encoded) CURIE (without brackets) concept object identifier,  typically, of a concept selected from the list of concepts originally returned by a /concepts API call on a given KS.  # noqa: E501
-
-    :param conceptId: (url-encoded) CURIE identifier of the concept to be matched
-    :type conceptId: str
-
-    :rtype: List[str]
-    """
-    return _get_exact_matches(conceptId)
 
 def get_exact_matches_to_concept_list(c):  # noqa: E501
     """get_exact_matches_to_concept_list
@@ -25,28 +15,37 @@ def get_exact_matches_to_concept_list(c):  # noqa: E501
 
     :rtype: List[str]
     """
-    s = set(c)
+
+    s = []
     for conceptId in c:
-        exactmatches = _get_exact_matches(conceptId)
-        s = s.union(exactmatches)
-    return list(s)
+        e = _get_exact_matches(conceptId)
+        s.append(e)
+
+    return s
 
 # ttl is "time to live" in seconds
-@ttl_cache(maxsize=300, ttl=120)
+@ttl_cache(maxsize=1000, ttl=86400)
 def _get_exact_matches(conceptId):
     results = GolrSearchQuery(
         term=conceptId,
         fq={'id' : conceptId},
         rows=1,
         hl=False
-    ).exec()
+    ).search()
 
-    docs = results['docs']
+    docs = results.docs
 
     exactmatches = []
+
     for d in docs:
         if  utils.get_property(d, 'id') == conceptId:
-            # exactmatches = get_concept_property(d, 'equivalent_curie')
             matches = utils.get_property(d, 'equivalent_curie', [])
             exactmatches.extend(matches)
-    return exactmatches
+
+    e = ExactMatchResponse(
+        id=conceptId,
+        within_domain=len(docs) != 0,
+        has_exact_matches=exactmatches
+    )
+
+    return e

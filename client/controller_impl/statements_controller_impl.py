@@ -71,18 +71,20 @@ def get_statements(s, relations=None, t=None, keywords=None, types=None, pageNum
         statement_subject = BeaconStatementSubject(
             id=_subject['id'],
             name=_subject['label'],
-            type=', '.join(subject_categories)
+            category=', '.join(subject_categories)
         )
 
         statement_object = BeaconStatementObject(
             id=_object['id'],
             name=_object['label'],
-            type=', '.join(object_categories)
+            category=', '.join(object_categories)
         )
 
+        edge_label = '_'.join(_relation['label'].split(' '))
+
         statement_predicate = BeaconStatementPredicate(
-            id=_relation['id'],
-            name=_relation['label']
+            relation=_relation['id'],
+            edge_label=edge_label
         )
 
         identifier = d['id']
