@@ -37,10 +37,10 @@ def get_concept_details(conceptId):  # noqa: E501
         synonyms=synonyms
     )
 
-    return [concept]
+    return [concept] if concept.id == conceptId else []
 
 
-def get_concepts(keywords, types=None, pageNumber=None, pageSize=None):  # noqa: E501
+def get_concepts(keywords, types=None, pageSize=None):  # noqa: E501
     """get_concepts
 
     Retrieves a (paged) list of whose concept in the beacon knowledge base with names and/or synonyms matching a set of keywords or substrings. The (possibly paged) results returned should generally be returned in order of the quality of the match, that is, the highest ranked concepts should exactly match the most keywords, in the same order as the keywords were given. Lower quality hits with fewer keyword matches or out-of-order keyword matches, should be returned lower in the list.  # noqa: E501
@@ -57,6 +57,8 @@ def get_concepts(keywords, types=None, pageNumber=None, pageSize=None):  # noqa:
     :rtype: List[BeaconConcept]
     """
 
+    pageSize = utils.sanitize_int(pageSize, 5)
+
     if types is not None:
         types = [utils.map_category(t) for t in types]
 
@@ -64,7 +66,6 @@ def get_concepts(keywords, types=None, pageNumber=None, pageSize=None):  # noqa:
         utils.base_path() + 'search/entity/' + ' '.join(keywords),
         params={
             'rows': pageSize,
-            'start': pageNumber,
             'category': types
         }
     ).json()
