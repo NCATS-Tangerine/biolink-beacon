@@ -11,7 +11,7 @@ info:
   license:
     name: "MIT License"
     url: "http://opensource.org/licenses/MIT"
-host: "rkb.ncats.io"
+host: "biolink-kb.ncats.io"
 basePath: "/"
 tags:
 - name: "metadata"
