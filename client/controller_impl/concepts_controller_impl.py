@@ -17,25 +17,30 @@ def get_concept_details(conceptId):  # noqa: E501
     :rtype: List[BeaconConceptWithDetails]
     """
 
-    json_response = requests.get(
-        utils.base_path() + 'bioentity/' + conceptId
-    ).json()
+    response = requests.get(utils.base_path() + 'bioentity/' + conceptId)
+
+    if response.status_code != 200:
+        raise Exception(response.url + " returned status code: " + str(response.status_code))
+
+    json_response = response.json()
 
     json_response = {k : v for k, v in json_response.items() if v is not None}
 
     synonyms = [d.get('val') for d in json_response.get('synonyms', []) if d.get('val') != None]
 
+    categories = [utils.map_category(c) for c in json_response.get('categories', [])]
+
     concept = BeaconConceptWithDetails(
         id=json_response.get('id', None),
         name=json_response.get('label', None),
-        type=' '.join(json_response.get('categories', [])),
+        category=', '.join(categories),
         synonyms=synonyms
     )
 
-    return [concept]
+    return [concept] if concept.id == conceptId else []
 
 
-def get_concepts(keywords, types=None, pageNumber=None, pageSize=None):  # noqa: E501
+def get_concepts(keywords, types=None, pageSize=None):  # noqa: E501
     """get_concepts
 
     Retrieves a (paged) list of whose concept in the beacon knowledge base with names and/or synonyms matching a set of keywords or substrings. The (possibly paged) results returned should generally be returned in order of the quality of the match, that is, the highest ranked concepts should exactly match the most keywords, in the same order as the keywords were given. Lower quality hits with fewer keyword matches or out-of-order keyword matches, should be returned lower in the list.  # noqa: E501
@@ -52,11 +57,15 @@ def get_concepts(keywords, types=None, pageNumber=None, pageSize=None):  # noqa:
     :rtype: List[BeaconConcept]
     """
 
+    pageSize = utils.sanitize_int(pageSize, 5)
+
+    if types is not None:
+        types = [utils.map_category(t) for t in types]
+
     json_response = requests.get(
         utils.base_path() + 'search/entity/' + ' '.join(keywords),
         params={
             'rows': pageSize,
-            'start': pageNumber,
             'category': types
         }
     ).json()
@@ -64,17 +73,27 @@ def get_concepts(keywords, types=None, pageNumber=None, pageSize=None):  # noqa:
     concepts = []
 
     for d in json_response['docs']:
-        name = utils.sanitize_str(utils.get_property(d, 'label'))
-        category = utils.sanitize_str(utils.get_property(d, 'category'))
-        definition = utils.sanitize_str(utils.get_property(d, 'definition'))
+        category = utils.get_property(d, 'category')
 
+        if isinstance(category, list):
+            category = [utils.map_category(c) for c in category]
+        elif isinstance(category, str):
+            category = utils.map_category(category)
+
+        name = utils.sanitize_str(utils.get_property(d, 'label'))
+
+        category = utils.sanitize_str(category)
+
+        synonym = utils.get_property(d, 'synonym', [])
+
+        definition = utils.sanitize_str(utils.get_property(d, 'definition'))
         definition = '' if definition == 'None' else definition
 
         concept = BeaconConcept(
             id=utils.get_property(d, 'id'),
             name=name,
-            type=category,
-            synonyms=utils.get_property(d, 'synonym', []),
+            category=category,
+            synonyms=synonym,
             definition=definition
         )
 

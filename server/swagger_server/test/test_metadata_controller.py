@@ -5,7 +5,7 @@ from __future__ import absolute_import
 from flask import json
 from six import BytesIO
 
-from swagger_server.models.beacon_concept_type import BeaconConceptType  # noqa: E501
+from swagger_server.models.beacon_concept_category import BeaconConceptCategory  # noqa: E501
 from swagger_server.models.beacon_knowledge_map_statement import BeaconKnowledgeMapStatement  # noqa: E501
 from swagger_server.models.beacon_predicate import BeaconPredicate  # noqa: E501
 from swagger_server.test import BaseTestCase
@@ -14,13 +14,13 @@ from swagger_server.test import BaseTestCase
 class TestMetadataController(BaseTestCase):
     """MetadataController integration test stubs"""
 
-    def test_get_concept_types(self):
-        """Test case for get_concept_types
+    def test_get_concept_categories(self):
+        """Test case for get_concept_categories
 
         
         """
         response = self.client.open(
-            '//types',
+            '//categories',
             method='GET')
         self.assert200(response,
                        'Response body is : ' + response.data.decode('utf-8'))
