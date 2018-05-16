@@ -6,12 +6,19 @@ A knowledge beacon implementation for the Monarch Biolink API (https://api.monar
 
 ```shell
 docker build -t ncats:biolink .
-docker run -d --rm --name biolink -p 8080:8080 ncats:biolink
+docker run -d --rm --name biolink -p 8078:8080 ncats:biolink
 ```
 
 This will run the Docker container named 'biolink' as a daemon.
 
-Navigate to http://localhost:8080/ui/ in your browser to see the Swagger UI
+Navigate to http://localhost:8078/ui/ in your browser to see the Swagger UI
+
+Sometimes, if you get an unexpected runtime error, docker will fail and exit silently, denying you access to the log message of the error.  In such a situation, you need to run docker directly to see the error. In that case, omit the **-d** argument in the previous docker run command, i.e.
+
+```shell
+docker run -rm --name biolink -p 8078:8080 ncats:biolink
+```
+The runtime error should now show up on your console.
 
 ## Usage
 http://localhost:8080/concepts?keywords=FANC&pageSize=1
