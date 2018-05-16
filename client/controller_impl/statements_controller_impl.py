@@ -7,7 +7,7 @@ from ontobio.golr.beacon_query import BeaconAssociationQuery
 
 from controller_impl import utils
 
-def get_statements(s, relations=None, t=None, keywords=None, types=None, pageNumber=None, pageSize=None):  # noqa: E501
+def get_statements(s, relations=None, t=None, keywords=None, types=None, pageSize=None):  # noqa: E501
     """get_statements
 
     Given a specified set of [CURIE-encoded](https://www.w3.org/TR/curie/) &#39;source&#39; (&#39;s&#39;) concept identifiers,  retrieves a paged list of relationship statements where either the subject or object concept matches any of the input &#39;source&#39; concepts provided.  Optionally, a set of &#39;target&#39; (&#39;t&#39;) concept  identifiers may also be given, in which case a member of the &#39;target&#39; identifier set should match the concept opposing the &#39;source&#39; in the  statement, that is, if the&#39;source&#39; matches a subject, then the  &#39;target&#39; should match the object of a given statement (or vice versa).  # noqa: E501
@@ -29,7 +29,6 @@ def get_statements(s, relations=None, t=None, keywords=None, types=None, pageNum
 
     :rtype: List[Statement]
     """
-    pageNumber = utils.sanitize_int(pageNumber)
     pageSize = utils.sanitize_int(pageSize, 5)
 
     if types is not None:
@@ -41,7 +40,6 @@ def get_statements(s, relations=None, t=None, keywords=None, types=None, pageNum
     	keywords=keywords,
         categories=types,
     	relations=relations,
-        start=pageNumber,
         rows=pageSize
     )
 

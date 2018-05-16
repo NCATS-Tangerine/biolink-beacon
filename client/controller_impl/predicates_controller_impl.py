@@ -34,10 +34,11 @@ def get_predicates():
 		identifier = p['value']
 		for pivot in p['pivot']:
 			name = pivot['value']
-			# not currently used
 			count = pivot['count']
 
-			p = BeaconPredicate(id=identifier, name=name, definition=None)
+			edge_label = utils.snake_case(name)
+
+			p = BeaconPredicate(id=identifier, edge_label=edge_label, frequency=count)
 
 			predicates.append(p)
 

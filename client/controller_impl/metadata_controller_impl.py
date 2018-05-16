@@ -17,7 +17,7 @@ _MONARCH_PREFIX_URI='https://api.monarchinitiative.org/api/identifier/prefixes/'
 __time_to_live_in_seconds = 604800
 
 @ttl_cache(maxsize=300, ttl=__time_to_live_in_seconds)
-def get_concept_types():  # noqa: E501
+def get_concept_categories():  # noqa: E501
 	"""get_concept_types
 
 	Get a list of types and # of instances in the knowledge source, and a link to the API call for the list of equivalent terminology  # noqa: E501
@@ -49,7 +49,7 @@ def get_concept_types():  # noqa: E501
 		frequency = counts[category]
 		iri = term.uri()
 
-		t = BeaconConceptType(id=_id, label=label, frequency=frequency, iri=iri)
+		t = BeaconConceptCategory(id=_id, category=label, frequency=frequency, uri=iri)
 
 		types.append(t)
 
@@ -104,18 +104,17 @@ def get_knowledge_map():
 								object_prefixes.append(prefix)
 
 					map_object = BeaconKnowledgeMapObject(
-						type=object_category,
+						category=object_category,
 						prefixes=object_prefixes
 					)
 
 					map_subject = BeaconKnowledgeMapSubject(
-						type=subject_category,
+						category=subject_category,
 						prefixes=subject_prefixes
 					)
 
 					map_predicate = BeaconKnowledgeMapPredicate(
-						id=relation_id,
-						name=relation_label
+						relation=relation_label
 					)
 
 					map_statement = BeaconKnowledgeMapStatement(
@@ -123,7 +122,7 @@ def get_knowledge_map():
 						object=map_object,
 						predicate=map_predicate,
 						frequency=count,
-						description=map_subject.type+" "+map_predicate.name.replace("_"," ")+" "+map_object.type
+						description=map_subject.category+" "+map_predicate.relation.replace("_"," ")+" "+map_object.category
 					)
 
 					statements.append(map_statement)
@@ -188,8 +187,9 @@ def __get_category_prefix_map():
 			rows=0
 		)
 
-		results = g.exec()
-		categories_count = results['facet_counts']['category']
+		results = g.search()
+		facet_counts = results.facet_counts
+		categories_count = facet_counts['category']
 
 		for category in categories_count.keys():
 			d[prefix] = {category : categories_count[category]}

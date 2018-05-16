@@ -2,6 +2,9 @@ import json
 
 from datetime import date, timedelta
 
+def snake_case(string):
+    return string.lower().replace(' ', '_')
+
 def map_category(category):
     """
     Monarch's categories don't perfectly map onto the biolink model
