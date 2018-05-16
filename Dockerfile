@@ -7,13 +7,11 @@ COPY /client /usr/src/client
 COPY requirements.txt /usr/src/requirements.txt
 
 # include --no-cache-dir flag when development finalizes?
-RUN pip install --upgrade pip && pip install -r /usr/src/requirements.txt
-
-WORKDIR /usr/src/server
-RUN python setup.py install
-
-WORKDIR /usr/src/client
-RUN python setup.py install
+RUN pip install --upgrade pip && \
+    pip install -r /usr/src/requirements.txt && \
+    pip install /usr/src/server/ && \
+    pip install /usr/src/client/ && \
+    pip install ontobio
 
 WORKDIR /usr/src/server
 
