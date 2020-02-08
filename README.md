@@ -2,10 +2,12 @@
 
 A knowledge beacon implementation for the Monarch Biolink API (https://api.monarchinitiative.org/api/), a biomedical data source containing information about diseases, phenotypes, and genes, and the relations between them.
 
+Use Python 3.7.4
+
 ## Installing and Running without Docker
 Errors may result if ontobio is not installed separately
 ```shell
-virtualenv -p python3 venv
+python -m venv venv
 source venv/bin/activate
 pip install -r requirements.txt
 pip install client/
