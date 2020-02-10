@@ -1,6 +1,11 @@
+# Application specific ignores
 server/predicates.json
 server/types.json
 server/kmap.json
+
+# IDE ignores
+# e.g. PyCharm
+.idea/
 
 *~
 swagger*.jar
