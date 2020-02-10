@@ -35,10 +35,11 @@ python -m swagger_server
 
 ```shell
 docker build -t ncats:biolink .
-docker run -d --rm --name biolink -p 8080:8080 ncats:biolink
+docker run -d --rm --name biolink -p 8078:8080 ncats:biolink
 ```
 
-This will run the Docker container named 'biolink' as a daemon.
+This will run the Docker container named 'biolink' as a daemon on port 8078 (which here is simply the port designated 
+as the beacon port number in the NCATS production deployment of the beacon).
 
 Navigate to http://localhost:8080/ui/ in your browser to see the Swagger UI
 
