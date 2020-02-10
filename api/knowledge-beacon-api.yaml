@@ -1,6 +1,6 @@
 swagger: '2.0'
 info:
-  title: Translator Knowledge Beacon API
+  title: Monarch Biolink Translator Knowledge Beacon API
   version: 1.1.1
   contact:
     url: 'http://starinformatics.com'

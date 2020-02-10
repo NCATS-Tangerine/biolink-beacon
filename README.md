@@ -32,6 +32,14 @@ pip for your venv:
 python -m pip install --upgrade pip
 ```
 
+### Site Configuration
+
+The beacon server runtime relies on a `swagger.yaml` file sitting under `server/swagger_server/swagger`. Two templates 
+are currently provided - one assuming a development 'localhost' host and root basepath; the other for NCATS endpoint 
+deployment. Copy over one or the other template into a file named `swagger.yaml` within the same directory.
+
+### Dependencies
+
 Then, run the following commands within the `biolink-beacon` directory. Note that errors may result if `ontobio` and 
 connexion[swagger-ui] are not installed separately.
 

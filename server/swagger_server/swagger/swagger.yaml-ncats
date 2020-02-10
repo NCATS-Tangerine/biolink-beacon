@@ -1,8 +1,7 @@
 ---
 swagger: "2.0"
 info:
-  description: "This is the Translator Knowledge Beacon web service application programming\
-    \ interface (API).\n"
+  description: "Monarch Biolink Translator Knowledge Beacon API.\n"
   version: "1.0.18"
   title: "Translator Knowledge Beacon API"
   contact:
@@ -11,8 +10,8 @@ info:
   license:
     name: "MIT License"
     url: "http://opensource.org/licenses/MIT"
-host: "biolink-kb.ncats.io"
-basePath: "/"
+host: "kb.ncats.io"
+basePath: "/beacon/biolink/"
 tags:
 - name: "metadata"
   description: "Queries about global characteristics of the knowledge source"
