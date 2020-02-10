@@ -28,7 +28,7 @@ def get_concept_details(conceptId):  # noqa: E501
 
     synonyms = [d.get('val') for d in json_response.get('synonyms', []) if d.get('val') != None]
 
-    categories = [utils.map_category(c) for c in json_response.get('categories', [])]
+    categories = [utils.map_category(c) for c in json_response.get('category', [])]
 
     concept = BeaconConceptWithDetails(
         id=json_response.get('id', None),

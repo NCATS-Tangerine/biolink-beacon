@@ -57,8 +57,8 @@ def get_statements(s, relations=None, t=None, keywords=None, types=None, pageSiz
         if _subject is None or _object is None or _relation is None:
             continue
 
-        subject_categories = _subject['categories']
-        object_categories = _object['categories']
+        subject_categories = _subject['category']
+        object_categories = _object['category']
 
         if isinstance(subject_categories, list):
             subject_categories = [utils.map_category(c) for c in subject_categories]
