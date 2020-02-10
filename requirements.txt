@@ -1,5 +1,4 @@
 connexion
-connexion[swagger-ui]
 typing
 tornado
 pymongo

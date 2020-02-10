@@ -32,12 +32,13 @@ pip for your venv:
 python -m pip install --upgrade pip
 ```
 
-Then, run the following commands within the `biolink-beacon` directory. Note that errors may result if `ontobio` is 
-not installed separately.
+Then, run the following commands within the `biolink-beacon` directory. Note that errors may result if `ontobio` and 
+connexion[swagger-ui] are not installed separately.
 
 ```shell
 pip install ontobio
 pip install -r requirements.txt
+pip install connexion[swagger-ui]
 pip install client/
 pip install server/
 cd server/
