@@ -2,9 +2,19 @@
 
 A knowledge beacon implementation for the Monarch Biolink API (https://api.monarchinitiative.org/api/), a biomedical data source containing information about diseases, phenotypes, and genes, and the relations between them.
 
-Use Python 3.7.4
+## Getting the Project
+
+The **biolink-beacon** package is not yet available through PyPI, thus, to install, clone this repo using git.
+
+```bash
+git clone https://github.com/NCATS-Tangerine/biolink-beacon
+
+# ... then  enter  into your cloned project repository
+cd biolink-beacon
+```
 
 ## Installing and Running without Docker
+
 Errors may result if ontobio is not installed separately
 ```shell
 python -m venv venv
