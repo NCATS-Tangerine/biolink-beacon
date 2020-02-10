@@ -63,9 +63,8 @@ docker run -d --rm --name biolink -p 8078:8080 ncats:biolink
 This will run the Docker container named 'biolink' as a daemon on port 8078 (which here is simply the port designated 
 as the beacon port number in the NCATS production deployment of the beacon).
 
-Navigate to http://localhost:8078/ui/ in your browser to see the Swagger UI or whichever URL to which you have aliased 
-the server (e.g. for NCATS, might be something like 
-[https://kba.ncats.io/beacon/biolink](https://kba.ncats.io/beacon/biolink)).
+Navigate to http://localhost:8078 in your browser to see the Swagger UI or whichever URL to which you have aliased 
+the server (e.g. for NCATS, might be something like https://kba.ncats.io/beacon/biolink).
 
 ## Usage
 
