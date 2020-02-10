@@ -9,10 +9,11 @@ COPY requirements.txt /usr/src/requirements.txt
 
 # include --no-cache-dir flag when development finalizes?
 RUN pip install --upgrade pip && \
+    pip install ontobio && \
     pip install -r /usr/src/requirements.txt && \
-    pip install /usr/src/server/ && \
+    pip install connexion[swagger-ui] && \
     pip install /usr/src/client/ && \
-    pip install ontobio
+    pip install /usr/src/server/
 
 WORKDIR /usr/src/server
 
