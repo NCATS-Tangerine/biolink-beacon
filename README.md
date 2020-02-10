@@ -15,13 +15,20 @@ cd biolink-beacon
 
 ## Installing and Running without Docker
 
-The application expects to use a Python release 3.7.4 or newer binary (note that your binary in the `venv` command 
-below may just be typed as `python` but the `python --version` should resolve to 3.7.4 or better).
+First, create a virtual environment:
+```shell
+python3.7 -m venv venv
+source venv/bin/activate
+```
 
-Make sure that your pip version is 3.7 compliant. It is also a good idea to ensure that you have the latest version of 
+The application expects to use a Python release 3.7.4 or newer binary (note that your binary in the `venv` command 
+above may just be typed as `python3.7`, `python3` or even just `python` but the `python --version` should 
+resolve to 3.7.4 or better). 
+
+Next, make sure that your pip version is 3.7 compliant. It is also a good idea to ensure that you have the latest version of 
 pip for your venv:
 
-```python
+```shell
 python -m pip install --upgrade pip
 ```
 
@@ -29,8 +36,6 @@ Then, run the following commands within the `biolink-beacon` directory. Note tha
 not installed separately.
 
 ```shell
-python3.7 -m venv venv
-source venv/bin/activate
 pip install ontobio
 pip install -r requirements.txt
 pip install client/
