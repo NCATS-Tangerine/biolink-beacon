@@ -1,8 +1,7 @@
 connexion
 connexion[swagger-ui]
-ontobio
 typing
 tornado
 pymongo
 cachetools
-pandas
+pandas==0.24.2
