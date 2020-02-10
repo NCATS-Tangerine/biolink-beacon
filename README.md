@@ -4,7 +4,7 @@ A knowledge beacon implementation for the Monarch Biolink API (https://api.monar
 
 ## Getting the Project
 
-The **translator-modules** package is not yet available through PyPI, thus, to install, clone this repo using git.
+The **biolink-beacon** package is not yet available through PyPI, thus, to install, clone this repo using git.
 
 ```bash
 git clone https://github.com/NCATS-Tangerine/biolink-beacon
@@ -15,9 +15,13 @@ cd biolink-beacon
 
 ## Installing and Running without Docker
 
-Errors may result if ontobio is not installed separately
+The application expects to use a Python release 3.7.4 or newer binary (note that your binary in the `venv` command 
+below may just be typed as `python` but the `python --version` should resolve to 3.7.4 or better).
+
+Errors may result if `ontobio` is not installed separately.
+
 ```shell
-virtualenv -p python3 venv
+python3.7 -m venv venv
 source venv/bin/activate
 pip install -r requirements.txt
 pip install client/

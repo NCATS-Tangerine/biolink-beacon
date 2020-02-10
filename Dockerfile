@@ -1,4 +1,5 @@
-FROM python:3
+# Should be Python 3.7.4 or better, probably at least 3.7.6 as of February 2020
+FROM python:3.7
 
 RUN mkdir -p /usr/src
 

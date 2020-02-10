@@ -1,7 +1,8 @@
 connexion
-# ontobio==0.2.35
-typing==3.6.4
-tornado==4.5.3
+connexion[swagger-ui]
+ontobio
+typing
+tornado
 pymongo
-cachetools==2.0.1
-pandas<0.21
+cachetools
+pandas
