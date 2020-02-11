@@ -13,18 +13,30 @@ def get_statement_details(statementId, keywords=None, size=10):
     if statementId.startswith(prefix):
         statementId = statementId[len(prefix):]
 
-    import pudb; pu.db
-
     path = utils.base_path() + 'association/' + statementId
     params = {'page' : 0, 'rows' : size}
 
     json_response = requests.get(path, params).json()
 
-    s = BeaconStatementWithDetails(
-        id=None,
-        is_defined_by=None,
-        provided_by=None,
-        qualifiers=[],
+    associations = json_response['associations']
+
+    if len(associations) != 1:
+        raise Exception(f'Expected exactly one association [count={len(associations)}, statementId={statementId}]')
+
+    a = associations[0]
+
+    provided_by = a.get('provided_by')
+
+    if isinstance(provided_by, (list, tuple, set)):
+        provided_by = ', '.join(provided_by)
+
+    qualifiers = a.get('qualifiers')
+
+    return BeaconStatementWithDetails(
+        id=statementId,
+        is_defined_by=json_response.get('isDefinedBy'),
+        provided_by=provided_by,
+        qualifiers=qualifiers,
         annotation=[],
         evidence=[]
     )
