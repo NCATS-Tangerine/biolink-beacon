@@ -15,21 +15,31 @@ class BeaconKnowledgeMapPredicate(Model):
     Do not edit the class manually.
     """
 
-    def __init__(self, relation: str=None):  # noqa: E501
+    def __init__(self, edge_label: str=None, relation: str=None, negated: bool=None):  # noqa: E501
         """BeaconKnowledgeMapPredicate - a model defined in Swagger
 
+        :param edge_label: The edge_label of this BeaconKnowledgeMapPredicate.  # noqa: E501
+        :type edge_label: str
         :param relation: The relation of this BeaconKnowledgeMapPredicate.  # noqa: E501
         :type relation: str
+        :param negated: The negated of this BeaconKnowledgeMapPredicate.  # noqa: E501
+        :type negated: bool
         """
         self.swagger_types = {
-            'relation': str
+            'edge_label': str,
+            'relation': str,
+            'negated': bool
         }
 
         self.attribute_map = {
-            'relation': 'relation'
+            'edge_label': 'edge_label',
+            'relation': 'relation',
+            'negated': 'negated'
         }
 
+        self._edge_label = edge_label
         self._relation = relation
+        self._negated = negated
 
     @classmethod
     def from_dict(cls, dikt) -> 'BeaconKnowledgeMapPredicate':
@@ -43,10 +53,33 @@ class BeaconKnowledgeMapPredicate(Model):
         return util.deserialize_model(dikt, cls)
 
     @property
+    def edge_label(self) -> str:
+        """Gets the edge_label of this BeaconKnowledgeMapPredicate.
+
+        Human readable name of the 'minimal' standard Biolink Model predicate relationship name.   See [Biolink Model](https://biolink.github.io/biolink-model)  for the full list of terms.   # noqa: E501
+
+        :return: The edge_label of this BeaconKnowledgeMapPredicate.
+        :rtype: str
+        """
+        return self._edge_label
+
+    @edge_label.setter
+    def edge_label(self, edge_label: str):
+        """Sets the edge_label of this BeaconKnowledgeMapPredicate.
+
+        Human readable name of the 'minimal' standard Biolink Model predicate relationship name.   See [Biolink Model](https://biolink.github.io/biolink-model)  for the full list of terms.   # noqa: E501
+
+        :param edge_label: The edge_label of this BeaconKnowledgeMapPredicate.
+        :type edge_label: str
+        """
+
+        self._edge_label = edge_label
+
+    @property
     def relation(self) -> str:
         """Gets the relation of this BeaconKnowledgeMapPredicate.
 
-        Human readable name of the maximal given predicate relation. This should be specified as Biolink predicate names like  gene_associated_with_condition. See [Biolink Model](https://biolink.github.io/biolink-model) for the full list of terms   # noqa: E501
+        Human readable name of a 'maximal' Biolink Model or beacon-specific (or Reasoner-specific) predicate relationship name.   # noqa: E501
 
         :return: The relation of this BeaconKnowledgeMapPredicate.
         :rtype: str
@@ -57,10 +90,31 @@ class BeaconKnowledgeMapPredicate(Model):
     def relation(self, relation: str):
         """Sets the relation of this BeaconKnowledgeMapPredicate.
 
-        Human readable name of the maximal given predicate relation. This should be specified as Biolink predicate names like  gene_associated_with_condition. See [Biolink Model](https://biolink.github.io/biolink-model) for the full list of terms   # noqa: E501
+        Human readable name of a 'maximal' Biolink Model or beacon-specific (or Reasoner-specific) predicate relationship name.   # noqa: E501
 
         :param relation: The relation of this BeaconKnowledgeMapPredicate.
         :type relation: str
         """
 
         self._relation = relation
+
+    @property
+    def negated(self) -> bool:
+        """Gets the negated of this BeaconKnowledgeMapPredicate.
+
+
+        :return: The negated of this BeaconKnowledgeMapPredicate.
+        :rtype: bool
+        """
+        return self._negated
+
+    @negated.setter
+    def negated(self, negated: bool):
+        """Sets the negated of this BeaconKnowledgeMapPredicate.
+
+
+        :param negated: The negated of this BeaconKnowledgeMapPredicate.
+        :type negated: bool
+        """
+
+        self._negated = negated

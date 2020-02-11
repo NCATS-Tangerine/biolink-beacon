@@ -109,7 +109,7 @@ class BeaconPredicate(Model):
     def uri(self) -> str:
         """Gets the uri of this BeaconPredicate.
 
-        The predicate URI which should generally resolves to the  full semantic description of the predicate relation  # noqa: E501
+        The predicate URI which should generally resolves to the full semantic description of the predicate relation  # noqa: E501
 
         :return: The uri of this BeaconPredicate.
         :rtype: str
@@ -120,7 +120,7 @@ class BeaconPredicate(Model):
     def uri(self, uri: str):
         """Sets the uri of this BeaconPredicate.
 
-        The predicate URI which should generally resolves to the  full semantic description of the predicate relation  # noqa: E501
+        The predicate URI which should generally resolves to the full semantic description of the predicate relation  # noqa: E501
 
         :param uri: The uri of this BeaconPredicate.
         :type uri: str
@@ -132,7 +132,7 @@ class BeaconPredicate(Model):
     def edge_label(self) -> str:
         """Gets the edge_label of this BeaconPredicate.
 
-        human readable name of a 'minimal' Biolink model predicate relation terms (see [Biolink Model](https://biolink.github.io/biolink-model) for the full list of terms)   # noqa: E501
+        A predicate edge label which must be taken from the minimal predicate ('slot') list of the [Biolink Model](https://biolink.github.io/biolink-model).   # noqa: E501
 
         :return: The edge_label of this BeaconPredicate.
         :rtype: str
@@ -143,7 +143,7 @@ class BeaconPredicate(Model):
     def edge_label(self, edge_label: str):
         """Sets the edge_label of this BeaconPredicate.
 
-        human readable name of a 'minimal' Biolink model predicate relation terms (see [Biolink Model](https://biolink.github.io/biolink-model) for the full list of terms)   # noqa: E501
+        A predicate edge label which must be taken from the minimal predicate ('slot') list of the [Biolink Model](https://biolink.github.io/biolink-model).   # noqa: E501
 
         :param edge_label: The edge_label of this BeaconPredicate.
         :type edge_label: str
@@ -155,7 +155,7 @@ class BeaconPredicate(Model):
     def relation(self) -> str:
         """Gets the relation of this BeaconPredicate.
 
-        human readable name of a 'maximal' Biolink model predicate relation terms (see [Biolink Model](https://biolink.github.io/biolink-model) for the full list of terms)   # noqa: E501
+        The predicate relation, with the preferred format being a CURIE where one exists, but strings/labels acceptable. This relation  may be equivalent to the edge_label (e.g. edge_label: has_phenotype, relation: RO:0002200), or a more specific relation in cases where the source provides more granularity  (e.g. edge_label: molecularly_interacts_with, relation: RO:0002447)   # noqa: E501
 
         :return: The relation of this BeaconPredicate.
         :rtype: str
@@ -166,7 +166,7 @@ class BeaconPredicate(Model):
     def relation(self, relation: str):
         """Sets the relation of this BeaconPredicate.
 
-        human readable name of a 'maximal' Biolink model predicate relation terms (see [Biolink Model](https://biolink.github.io/biolink-model) for the full list of terms)   # noqa: E501
+        The predicate relation, with the preferred format being a CURIE where one exists, but strings/labels acceptable. This relation  may be equivalent to the edge_label (e.g. edge_label: has_phenotype, relation: RO:0002200), or a more specific relation in cases where the source provides more granularity  (e.g. edge_label: molecularly_interacts_with, relation: RO:0002447)   # noqa: E501
 
         :param relation: The relation of this BeaconPredicate.
         :type relation: str
@@ -178,7 +178,7 @@ class BeaconPredicate(Model):
     def local_id(self) -> str:
         """Gets the local_id of this BeaconPredicate.
 
-        CURIE-encoded identifier of the locally defined predicate relation. Such terms should be formally documented as mappings in the  [Biolink Model](https://biolink.github.io/biolink-model)   # noqa: E501
+        CURIE-encoded identifier of the locally defined predicate relation. Such terms should be formally documented as mappings in the [Biolink Model](https://biolink.github.io/biolink-model)   # noqa: E501
 
         :return: The local_id of this BeaconPredicate.
         :rtype: str
@@ -189,7 +189,7 @@ class BeaconPredicate(Model):
     def local_id(self, local_id: str):
         """Sets the local_id of this BeaconPredicate.
 
-        CURIE-encoded identifier of the locally defined predicate relation. Such terms should be formally documented as mappings in the  [Biolink Model](https://biolink.github.io/biolink-model)   # noqa: E501
+        CURIE-encoded identifier of the locally defined predicate relation. Such terms should be formally documented as mappings in the [Biolink Model](https://biolink.github.io/biolink-model)   # noqa: E501
 
         :param local_id: The local_id of this BeaconPredicate.
         :type local_id: str

@@ -6,17 +6,7 @@ from swagger_server.models.beacon_concept_detail import BeaconConceptDetail
 
 from controller_impl import utils
 
-def get_concept_details(conceptId):  # noqa: E501
-    """get_concept_details
-
-    Retrieves details for a specified concepts in the system, as specified by a (url-encoded) CURIE identifier of a concept known the given knowledge source.  # noqa: E501
-
-    :param conceptId: (url-encoded) CURIE identifier of concept of interest
-    :type conceptId: str
-
-    :rtype: List[BeaconConceptWithDetails]
-    """
-
+def get_concept_details(conceptId):
     response = requests.get(utils.base_path() + 'bioentity/' + conceptId)
 
     if response.status_code != 200:
@@ -32,69 +22,57 @@ def get_concept_details(conceptId):  # noqa: E501
 
     concept = BeaconConceptWithDetails(
         id=json_response.get('id', None),
+        uri=json_response.get('iri', None),
         name=json_response.get('label', None),
-        category=', '.join(categories),
+        symbol=None,
+        categories=categories,
+        description=json_response.get('description', None),
         synonyms=synonyms
     )
 
     return [concept] if concept.id == conceptId else []
 
+def get_concepts(keywords, categories=None, size=None):
+    size = utils.sanitize_int(size, 10)
 
-def get_concepts(keywords, types=None, pageSize=None):  # noqa: E501
-    """get_concepts
+    params = {}
 
-    Retrieves a (paged) list of whose concept in the beacon knowledge base with names and/or synonyms matching a set of keywords or substrings. The (possibly paged) results returned should generally be returned in order of the quality of the match, that is, the highest ranked concepts should exactly match the most keywords, in the same order as the keywords were given. Lower quality hits with fewer keyword matches or out-of-order keyword matches, should be returned lower in the list.  # noqa: E501
+    if categories is not None:
+        categories = [utils.map_category(t) for t in categories]
+        params['category'] = categories
 
-    :param keywords: a (urlencoded) space delimited set of keywords or substrings against which to match concept names and synonyms
-    :type keywords: str
-    :param types: a (url-encoded) space-delimited set of semantic groups (specified as codes CHEM, GENE, ANAT, etc.) to which to constrain concepts matched by the main keyword search (see [Semantic Groups](https://metamap.nlm.nih.gov/Docs/SemGroups_2013.txt) for the full list of codes)
-    :type types: str
-    :param pageNumber: (1-based) number of the page to be returned in a paged set of query results
-    :type pageNumber: int
-    :param pageSize: number of concepts per page to be returned in a paged set of query results
-    :type pageSize: int
-
-    :rtype: List[BeaconConcept]
-    """
-
-    pageSize = utils.sanitize_int(pageSize, 5)
-
-    if types is not None:
-        types = [utils.map_category(t) for t in types]
+    if size is not None:
+        params['rows'] = size
 
     json_response = requests.get(
         utils.base_path() + 'search/entity/' + ' '.join(keywords),
-        params={
-            'rows': pageSize,
-            'category': types
-        }
-    ).json()
+        params=params
+    )
+
+    json_response = json_response.json()
 
     concepts = []
 
     for d in json_response['docs']:
-        category = utils.get_property(d, 'category')
+        _categories = utils.get_property(d, 'category')
 
-        if isinstance(category, list):
-            category = [utils.map_category(c) for c in category]
-        elif isinstance(category, str):
-            category = utils.map_category(category)
+        if isinstance(_categories, list):
+            _categories = [utils.map_category(c) for c in _categories]
+        elif isinstance(_categories, str):
+            _categories = [utils.map_category(_categories)]
 
         name = utils.sanitize_str(utils.get_property(d, 'label'))
-
-        category = utils.sanitize_str(category)
 
         synonym = utils.get_property(d, 'synonym', [])
 
         definition = utils.sanitize_str(utils.get_property(d, 'definition'))
-        definition = '' if definition == 'None' else definition
+        definition = None if definition == 'None' else definition
 
         concept = BeaconConcept(
             id=utils.get_property(d, 'id'),
             name=name,
-            category=category,
-            synonyms=synonym,
-            definition=definition
+            categories=_categories,
+            description=definition
         )
 
         concepts.append(concept)

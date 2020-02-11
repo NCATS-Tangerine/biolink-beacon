@@ -173,7 +173,7 @@ class BeaconConceptCategory(Model):
     def local_uri(self) -> str:
         """Gets the local_uri of this BeaconConceptCategory.
 
-        This locally designated category URI should generally  resolve to the full semantic description of the category  # noqa: E501
+        This locally designated category URI should generally resolve to the full semantic description of the category  # noqa: E501
 
         :return: The local_uri of this BeaconConceptCategory.
         :rtype: str
@@ -184,7 +184,7 @@ class BeaconConceptCategory(Model):
     def local_uri(self, local_uri: str):
         """Sets the local_uri of this BeaconConceptCategory.
 
-        This locally designated category URI should generally  resolve to the full semantic description of the category  # noqa: E501
+        This locally designated category URI should generally resolve to the full semantic description of the category  # noqa: E501
 
         :param local_uri: The local_uri of this BeaconConceptCategory.
         :type local_uri: str

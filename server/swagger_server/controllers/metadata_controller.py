@@ -11,7 +11,7 @@ import controller_impl as ctrl
 def get_concept_categories():  # noqa: E501
     """get_concept_categories
 
-    Get a list of concept categories and number of their concept instances documented by the knowledge source. These types should be mapped onto the Translator-endorsed Biolink Model concept type classes with local types, explicitly added as mappings to the Biolink Model YAML file.   # noqa: E501
+    Get a list of concept categories and number of their concept instances documented by the knowledge source. These types should be mapped onto the Translator-endorsed Biolink Model concept type classes with local types, explicitly added as mappings to the Biolink Model YAML file.  # noqa: E501
 
 
     :rtype: List[BeaconConceptCategory]

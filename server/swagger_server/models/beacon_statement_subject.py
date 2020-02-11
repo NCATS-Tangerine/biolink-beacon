@@ -15,31 +15,31 @@ class BeaconStatementSubject(Model):
     Do not edit the class manually.
     """
 
-    def __init__(self, id: str=None, name: str=None, category: str=None):  # noqa: E501
+    def __init__(self, id: str=None, name: str=None, categories: List[str]=None):  # noqa: E501
         """BeaconStatementSubject - a model defined in Swagger
 
         :param id: The id of this BeaconStatementSubject.  # noqa: E501
         :type id: str
         :param name: The name of this BeaconStatementSubject.  # noqa: E501
         :type name: str
-        :param category: The category of this BeaconStatementSubject.  # noqa: E501
-        :type category: str
+        :param categories: The categories of this BeaconStatementSubject.  # noqa: E501
+        :type categories: List[str]
         """
         self.swagger_types = {
             'id': str,
             'name': str,
-            'category': str
+            'categories': List[str]
         }
 
         self.attribute_map = {
             'id': 'id',
             'name': 'name',
-            'category': 'category'
+            'categories': 'categories'
         }
 
         self._id = id
         self._name = name
-        self._category = category
+        self._categories = categories
 
     @classmethod
     def from_dict(cls, dikt) -> 'BeaconStatementSubject':
@@ -99,24 +99,24 @@ class BeaconStatementSubject(Model):
         self._name = name
 
     @property
-    def category(self) -> str:
-        """Gets the category of this BeaconStatementSubject.
+    def categories(self) -> List[str]:
+        """Gets the categories of this BeaconStatementSubject.
 
         a semantic group for the subject concept (specified as a code gene, pathway, disease, etc. - see [Biolink Model](https://biolink.github.io/biolink-model) for the full list of categories)   # noqa: E501
 
-        :return: The category of this BeaconStatementSubject.
-        :rtype: str
+        :return: The categories of this BeaconStatementSubject.
+        :rtype: List[str]
         """
-        return self._category
+        return self._categories
 
-    @category.setter
-    def category(self, category: str):
-        """Sets the category of this BeaconStatementSubject.
+    @categories.setter
+    def categories(self, categories: List[str]):
+        """Sets the categories of this BeaconStatementSubject.
 
         a semantic group for the subject concept (specified as a code gene, pathway, disease, etc. - see [Biolink Model](https://biolink.github.io/biolink-model) for the full list of categories)   # noqa: E501
 
-        :param category: The category of this BeaconStatementSubject.
-        :type category: str
+        :param categories: The categories of this BeaconStatementSubject.
+        :type categories: List[str]
         """
 
-        self._category = category
+        self._categories = categories

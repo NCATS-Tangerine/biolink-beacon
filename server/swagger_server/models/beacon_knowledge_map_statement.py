@@ -6,9 +6,9 @@ from datetime import date, datetime  # noqa: F401
 from typing import List, Dict  # noqa: F401
 
 from swagger_server.models.base_model_ import Model
-from swagger_server.models.beacon_knowledge_map_object import BeaconKnowledgeMapObject  # noqa: F401,E501
-from swagger_server.models.beacon_knowledge_map_predicate import BeaconKnowledgeMapPredicate  # noqa: F401,E501
-from swagger_server.models.beacon_knowledge_map_subject import BeaconKnowledgeMapSubject  # noqa: F401,E501
+from swagger_server.models.beacon_knowledge_map_subject import BeaconKnowledgeMapSubject
+from swagger_server.models.beacon_knowledge_map_predicate import BeaconKnowledgeMapPredicate
+from swagger_server.models.beacon_knowledge_map_object import BeaconKnowledgeMapObject
 from swagger_server import util
 
 

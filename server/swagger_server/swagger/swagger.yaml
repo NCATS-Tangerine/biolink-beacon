@@ -3,7 +3,7 @@ swagger: "2.0"
 info:
   description: "This is the Translator Knowledge Beacon web service application programming\
     \ interface (API).\n"
-  version: "1.0.18"
+  version: "1.1.1"
   title: "Translator Knowledge Beacon API"
   contact:
     url: "http://starinformatics.com"
@@ -11,8 +11,7 @@ info:
   license:
     name: "MIT License"
     url: "http://opensource.org/licenses/MIT"
-host: "biolink-kb.ncats.io"
-basePath: "/"
+basePath: "/beacon/biolink/"
 tags:
 - name: "metadata"
   description: "Queries about global characteristics of the knowledge source"
@@ -32,16 +31,12 @@ paths:
       description: "Get a list of concept categories and number of their concept instances\
         \ documented by the knowledge source. These types should be mapped onto the\
         \ Translator-endorsed Biolink Model concept type classes with local types,\
-        \ explicitly added as mappings to the Biolink Model YAML file. \n"
+        \ explicitly added as mappings to the Biolink Model YAML file.\n"
       operationId: "get_concept_categories"
       parameters: []
       responses:
-        200:
+        "200":
           description: "Successful response with categories and frequency returned\n"
-          schema:
-            type: "array"
-            items:
-              $ref: "#/definitions/BeaconConceptCategory"
           examples:
             application/json:
             - id: "biolink:CellularComponent"
@@ -51,8 +46,12 @@ paths:
               local_uri: "http://amigo.geneontology.org/amigo/term/GO:0005575"
               local_category: "cellular_component"
               description: "The part of a cell, extracellular environment or virus\
-                \ in \nwhich a gene product is located.\n"
+                \ in\nwhich a gene product is located.\n"
               frequency: 12355
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/BeaconConceptCategory"
       x-swagger-router-controller: "swagger_server.controllers.metadata_controller"
   /predicates:
     get:
@@ -63,25 +62,25 @@ paths:
       operationId: "get_predicates"
       parameters: []
       responses:
-        200:
+        "200":
           description: "Successful response with predicates with CURIE and definitions\
             \ indexed by beacons which support the relation\n"
+          examples:
+            application/json:
+            - id: "biolink:has_phenotype"
+              uri: "http://bioentity.io/vocab/has_phenotype"
+              edge_label: "has_phenotype"
+              relation: "RO:001279"
+              local_id: "SIO:000983"
+              local_uri: "http://semanticscience.org/resource/SIO_001279"
+              local_relation: "has phenotype"
+              description: "has phenotype is a relation between an object and an\n\
+                observable/measurable characteristic\n"
+              frequency: 1234
           schema:
             type: "array"
             items:
               $ref: "#/definitions/BeaconPredicate"
-          examples:
-            application/json:
-            - id: "biolink:gene_associated_with_condition"
-              uri: "http://bioentity.io/vocab/gene_associated_with_condition"
-              edge_label: "gene_associated_with_condition"
-              relation: "exacerbates disease course"
-              local_id: "SIO:000983"
-              local_uri: "http://semanticscience.org/resource/SIO_000983"
-              local_relation: "gene-disease association"
-              description: "A gene-disease association is an association between \n\
-                a gene and a disease.\n"
-              frequency: 1234
       x-swagger-router-controller: "swagger_server.controllers.metadata_controller"
   /kmap:
     get:
@@ -92,12 +91,8 @@ paths:
       operationId: "get_knowledge_map"
       parameters: []
       responses:
-        200:
+        "200":
           description: "Successful response with categories and frequency returned\n"
-          schema:
-            type: "array"
-            items:
-              $ref: "#/definitions/BeaconKnowledgeMapStatement"
           examples:
             application/json:
             - subject:
@@ -117,18 +112,22 @@ paths:
               count: 500
               description: "a gene that is capable of some activity that affects the\
                 \ magnitude or nature of a pathological process, phenotype or disease\n"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/BeaconKnowledgeMapStatement"
       x-swagger-router-controller: "swagger_server.controllers.metadata_controller"
   /concepts:
     get:
       tags:
       - "concepts"
-      description: "Retrieves a (paged) list of whose concept in the \nbeacon knowledge\
-        \ base with names and/or synonyms \nmatching a set of keywords or substrings.\
-        \ \nThe (possibly paged) results returned should generally \nbe returned in\
-        \ order of the quality of the match, \nthat is, the highest ranked concepts\
-        \ should exactly \nmatch the most keywords, in the same order as the \nkeywords\
-        \ were given. Lower quality hits with fewer \nkeyword matches or out-of-order\
-        \ keyword matches, \nshould be returned lower in the list.\n"
+      description: "Retrieves a list of whose concept in the\nbeacon knowledge base\
+        \ with names and/or synonyms\nmatching a set of keywords or substrings.\n\
+        The results returned should generally\nbe returned in order of the quality\
+        \ of the match,\nthat is, the highest ranked concepts should exactly\nmatch\
+        \ the most keywords, in the same order as the\nkeywords were given. Lower\
+        \ quality hits with fewer\nkeyword matches or out-of-order keyword matches,\n\
+        should be returned lower in the list.\n"
       operationId: "get_concepts"
       parameters:
       - name: "keywords"
@@ -151,92 +150,28 @@ paths:
           type: "string"
       - name: "size"
         in: "query"
-        description: "maximum number of concept entries requested by the query (default\
-          \ 100)\n"
+        description: "maximum number of concept entries requested by the client; if\
+          \ this argument is omitted, then the query is expected to returned all \
+          \ the available data for the query\n"
         required: false
         type: "integer"
       responses:
-        200:
-          description: "Successful response with concept list returned\n"
-          schema:
-            type: "array"
-            items:
-              $ref: "#/definitions/BeaconConcept"
+        "200":
+          description: "Successful response with list of core concept data returned\n"
           examples:
             application/json:
             - id: "wd:Q6591532"
               name: "WRN protein, human"
-              category: "chemical substance"
-              synonyms:
-              - "RecQ3"
-              - "Werner Syndrome ATP-Dependent Helicase"
-              - "RECQL2 protein, human"
-              - "EC 3.1.-.-"
-              - "WRN protein, human"
-              - "WRN"
-              - "Exonuclease WRN"
-              - "Werner Syndrome Protein"
-              - "RecQ Protein-Like 2"
-              - "EC 3.6.4.12"
-              - "RECQ3 protein, human"
-              - "Werner syndrome helicase, human"
-              - "WRN Protein"
-              - "DNA Helicase, RecQ-Like Type 3"
-              definition: "Werner syndrome ATP-dependent helicase (1432 aa, ~162 kDa)\
-                \ is encoded by the human WRN gene. This protein plays a role in both\
-                \ magnesium and ATP-dependent DNA-helicase activity and 3\\'->5\\\
-                ' exonuclease activity towards double-stranded DNA with a 5\\'-overhang."
-            - id: "wd:Q18042562"
-              name: "WRNIP1"
-              category: "gene"
-              synonyms:
-              - "WHIP"
-              - "Werner helicase interacting protein 1"
-              - "WRNIP1"
-              - "bA420G6.2"
-              definition: "human gene"
-            - id: "wd:Q14883734"
-              name: "WRN"
-              category: "gene"
-              synonyms:
-              - "RECQ3"
-              - "RECQL3"
-              - "Werner syndrome RecQ like helicase"
-              - "RECQL2"
-              definition: "human gene"
-            - id: "wd:Q1154619"
-              name: "Werner Syndrome"
-              category: "disease"
-              synonyms:
-              - "Werner Syndrome"
-              - "Pangeria"
-              - "Syndrome, Werner"
-              - "Progeria, Adult"
-              - "Werner Syndrome [Disease/Finding]"
-              - "Werner syndrome (disorder)"
-              - "adult progeria"
-              - "Werner"
-              - "syndromes werner"
-              - "Syndrome, Werner\\'s"
-              - "WRN"
-              - "Werner\\'s syndrome"
-              - "adults progeria"
-              - "Werner syndrome (adult progeria) (diagnosis)"
-              - "Werner syndrome (adult progeria)"
-              - "Syndrome, Werners"
-              - "Adult premature aging syndrome"
-              - "syndromes werner\\'s"
-              - "Werners Syndrome"
-              - "syndrome werner"
-              - "Progeria of the adult"
-              - "WS"
-              - "syndromes werners"
-              - "Adult premature ageing syndrome"
-              definition: "autosomal recessive disorder that causes premature aging\
-                \ in adults, characterized by sclerodermal skin changes, cataracts,\
-                \ subcutaneous calcifications, muscular atrophy, a tendency to diabetes\
-                \ mellitus, aged appearance of the face, baldness, and a high incidence\
-                \ of neoplastic disease."
+              category: "protein"
+              description: "Werner syndrome ATP-dependent helicase (1432 aa, ~162\
+                \ kDa) is encoded by the human WRN gene. This protein plays a role\
+                \ in both magnesium and ATP-dependent DNA-helicase activity and 3\\\
+                '->5\\' exonuclease activity towards double-stranded DNA with a 5\\\
+                '-overhang."
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/BeaconConcept"
       x-swagger-router-controller: "swagger_server.controllers.concepts_controller"
   /concepts/{conceptId}:
     get:
@@ -253,20 +188,41 @@ paths:
         required: true
         type: "string"
       responses:
-        200:
+        "200":
           description: "Successful response with concept details returned\n"
-          schema:
-            type: "array"
-            items:
-              $ref: "#/definitions/BeaconConceptWithDetails"
           examples:
             application/json:
-            - id: "wd:Q14883734"
-              name: "WRN"
-              category: "gene"
-              synonyms: []
-              definition: "Werner Syndrome Gene"
-              details: []
+            - id: "wd:Q6591532"
+              name: "WRN protein, human"
+              category: "protein"
+              symbol: "WRN"
+              synonyms:
+              - "RecQ3"
+              - "Werner Syndrome ATP-Dependent Helicase"
+              - "RECQL2 protein, human"
+              - "EC 3.1.-.-"
+              - "WRN protein, human"
+              - "WRN"
+              - "Exonuclease WRN"
+              - "Werner Syndrome Protein"
+              - "RecQ Protein-Like 2"
+              - "EC 3.6.4.12"
+              - "RECQ3 protein, human"
+              - "Werner syndrome helicase, human"
+              - "WRN Protein"
+              - "DNA Helicase, RecQ-Like Type 3"
+              description: "Werner syndrome ATP-dependent helicase (1432 aa, ~162\
+                \ kDa) is encoded by the human WRN gene. This protein plays a role\
+                \ in both magnesium and ATP-dependent DNA-helicase activity and 3\\\
+                '->5\\' exonuclease activity towards double-stranded DNA with a 5\\\
+                '-overhang."
+              details:
+              - tag: "taxon"
+                value: "9606"
+              - tag: "phenotype"
+                value: "progeria"
+          schema:
+            $ref: "#/definitions/BeaconConceptWithDetails"
       x-swagger-router-controller: "swagger_server.controllers.concepts_controller"
   /exactmatches:
     get:
@@ -277,11 +233,11 @@ paths:
         \ retrieves the list of [CURIE](https://www.w3.org/TR/curie/) identifiers\
         \ of additional concepts that are deemed by the given knowledge source to\
         \ be exact matches to one or more of the input concepts **plus** whichever\
-        \ concept identifiers from the input list were specifically matched to  these\
+        \ concept identifiers from the input list were specifically matched to these\
         \ additional concepts, thus giving the whole known set of equivalent concepts\
-        \ known to this particular knowledge source.  If an empty set is  returned,\
-        \ the it can be assumed that the given knowledge source does  not know of\
-        \ any new equivalent concepts matching the input set. The caller of this endpoint\
+        \ known to this particular knowledge source.  If an empty set is returned,\
+        \ the it can be assumed that the given knowledge source does not know of any\
+        \ new equivalent concepts matching the input set. The caller of this endpoint\
         \ can then decide whether or not to treat  its input identifiers as its own\
         \ equivalent set.\n"
       operationId: "get_exact_matches_to_concept_list"
@@ -289,14 +245,14 @@ paths:
       - name: "c"
         in: "query"
         description: "an array set of [CURIE-encoded](https://www.w3.org/TR/curie/)\
-          \  identifiers of concepts thought to be exactly matching concepts, to be\
+          \ identifiers of concepts thought to be exactly matching concepts, to be\
           \ used in a search for additional exactly matching concepts [*sensa*-SKOS](http://www.w3.org/2004/02/skos/core#exactMatch).\n"
         required: true
         type: "array"
         items:
           type: "string"
       responses:
-        200:
+        "200":
           description: "Successful response returns a set of [CURIE-encoded](https://www.w3.org/TR/curie/)\
             \ identifiers of concepts (with supporting evidence code and reference)\
             \ matching at least one identifier in the input list of known exactly\
@@ -304,27 +260,27 @@ paths:
             \ Each concept identifier is returned with  the full list of any additional\
             \ associated [CURIE-encoded](https://www.w3.org/TR/curie/) identifiers\
             \ of exact match concepts known to the given Knowledge Source.\n"
-          schema:
-            type: "array"
-            items:
-              $ref: "#/definitions/ExactMatchResponse"
           examples:
             application/json:
             - "wd:Q14883734"
             - "NCBIGene:7486"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/ExactMatchResponse"
       x-swagger-router-controller: "swagger_server.controllers.concepts_controller"
   /statements:
     get:
       tags:
       - "statements"
       description: "Given a specified set of [CURIE-encoded](https://www.w3.org/TR/curie/)\
-        \  'source' ('s') concept identifiers,  retrieves a paged list of relationship\
-        \ statements where either the subject or object concept matches any of the\
-        \ input 'source' concepts provided.  Optionally, a set of 'target' ('t') concept\
-        \  identifiers may also be given, in which case a member of the 'target' identifier\
-        \ set should match the concept opposing the 'source' in the  statement, that\
-        \ is, if the'source' matches a subject, then the  'target' should match the\
-        \ object of a given statement (or vice versa).\n"
+        \ source ('s') concept identifiers,  retrieves a list of relationship statements\
+        \ where either the subject or object concept matches any of the input 'source'\
+        \ concepts provided.  Optionally, a set of target ('t') concept  identifiers\
+        \ may also be given, in which case a member of the 'target' identifier set\
+        \ should match the concept opposing the 'source' in the  statement, that is,\
+        \ if the'source' matches a subject, then the 'target' should match the object\
+        \ of a given statement (or vice versa).\n"
       operationId: "get_statements"
       parameters:
       - name: "s"
@@ -336,19 +292,27 @@ paths:
         type: "array"
         items:
           type: "string"
-      - name: "relations"
+      - name: "edge_label"
         in: "query"
-        description: "an array set of strings of Biolink predicate relation name labels\
-          \ against which to constrain the search for statement relations associated\
-          \ with the given query seed concept. The predicate  relation names for this\
-          \ parameter should be as published by  the beacon-aggregator by the /predicates\
-          \ API endpoint as taken from the minimal predicate list of the Biolink Model\
-          \  (see [Biolink Model](https://biolink.github.io/biolink-model)  for the\
-          \ full list of predicates).\n"
+        description: "(Optional) A predicate edge label against which to constrain\
+          \ the search for statements ('edges') associated with the given query seed\
+          \ concept. The predicate edge_names for this parameter should be as published\
+          \ by the /predicates API endpoint and must be taken from the minimal predicate\
+          \ ('slot') list of the [Biolink Model](https://biolink.github.io/biolink-model).\n"
         required: false
-        type: "array"
-        items:
-          type: "string"
+        type: "string"
+      - name: "relation"
+        in: "query"
+        description: "(Optional) A predicate relation against which to constrain the\
+          \ search for statements ('edges') associated with the given query seed concept.\
+          \ The predicate relations for this parameter should be as published by the\
+          \ /predicates API endpoint and the preferred format is a CURIE  where one\
+          \ exists, but strings/labels acceptable. This relation may be equivalent\
+          \ to the edge_label (e.g. edge_label: has_phenotype, relation: RO:0002200),\
+          \ or a more specific relation in cases where the source provides more granularity\
+          \ (e.g. edge_label: molecularly_interacts_with, relation: RO:0002447)\n"
+        required: false
+        type: "string"
       - name: "t"
         in: "query"
         description: "(optional) an array set of [CURIE-encoded](https://www.w3.org/TR/curie/)\
@@ -378,19 +342,16 @@ paths:
           type: "string"
       - name: "size"
         in: "query"
-        description: "maximum number of statement entries requested by the query (default\
-          \ 100)\n"
+        description: "maximum number of concept entries requested by the client; if\
+          \ this argument is omitted, then the query is expected to returned all \
+          \ the available data for the query\n"
         required: false
         type: "integer"
       responses:
-        200:
+        "200":
           description: "Successful response returns a list of concept-relations where\
             \ there is an exact match of an input concept identifier either to the\
-            \ subject or object concepts of the statement\n"
-          schema:
-            type: "array"
-            items:
-              $ref: "#/definitions/BeaconStatement"
+            \ subject or object concepts  of the statement\n"
           examples:
             application/json:
             - source: "semmeddb"
@@ -401,21 +362,28 @@ paths:
                 name: "KCNJ11"
                 category: "gene"
               predicate:
-                edge_label: "gene_associated_with_condition"
-                relation: "contributes_to_condition"
+                edge_label: "has_phenotype"
+                relation: "RO:0002200"
+                negated: false
               object:
                 id:
                 - "wd:Q2898645"
                 name: "Neonatal diabetes mellitus"
                 category: "disease"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/BeaconStatement"
       x-swagger-router-controller: "swagger_server.controllers.statements_controller"
-  /evidence/{statementId}:
+  /statements/{statementId}:
     get:
       tags:
       - "statements"
-      description: "Retrieves a (paged) list of annotations cited as evidence for\
-        \ a specified concept-relationship statement\n"
-      operationId: "get_evidence"
+      description: "Retrieves a details relating to a specified concept-relationship\
+        \ statement include 'is_defined_by and 'provided_by' provenance; extended\
+        \ edge properties exported as tag = value; and any associated annotations\
+        \ (publications, etc.)  cited as evidence for the given statement.\n"
+      operationId: "get_statement_details"
       parameters:
       - name: "statementId"
         in: "path"
@@ -425,36 +393,44 @@ paths:
         type: "string"
       - name: "keywords"
         in: "query"
-        description: "an array of keywords or substrings against which to filter citation\
-          \ titles"
+        description: "an array of keywords or substrings against which to  filter\
+          \ annotation names (e.g. publication titles)."
         required: false
         type: "array"
         items:
           type: "string"
       - name: "size"
         in: "query"
-        description: "maximum number of cited references requested by the query (default\
-          \ 100)\n"
+        description: "maximum number of concept entries requested by the client; if\
+          \ this argument is omitted, then the query is expected to returned all \
+          \ the available data for the query\n"
         required: false
         type: "integer"
       responses:
-        200:
-          description: "successful call returns a list of annotation with metadata\n"
-          schema:
-            type: "array"
-            items:
-              $ref: "#/definitions/BeaconAnnotation"
+        "200":
+          description: "successful call with statement details returned\n"
           examples:
             application/json:
-            - id:
-              - "pmid:22781086"
-              label: "Neonatal diabetes mellitus and congenital diaphragmatic hernia\
-                \ coincidence or concurrent etiology?"
-              type: "TAS"
-              date: "2012-07-10T00:00:00.000Z"
+              id: "kb:12345"
+              is_defined_by: "http://starinformatics.com"
+              provided_by: "https://skr3.nlm.nih.gov/SemMedDB/"
+              qualifiers: []
+              annotation:
+              - tag: "stage"
+                value: "neo-natal"
+              evidence:
+              - id: "PMID:22781086"
+                uri: "https://www.ncbi.nlm.nih.gov/pubmed/?term=22781086"
+                name: "Neonatal diabetes mellitus and congenital diaphragmatic hernia\
+                  \ coincidence or concurrent etiology?"
+                evidence_type: "ECO_0000033"
+                date: "2012-07-10T00:00:00.000Z"
+          schema:
+            $ref: "#/definitions/BeaconStatementWithDetails"
       x-swagger-router-controller: "swagger_server.controllers.statements_controller"
 definitions:
   BeaconStatement:
+    type: "object"
     properties:
       id:
         type: "string"
@@ -467,24 +443,64 @@ definitions:
       object:
         $ref: "#/definitions/BeaconStatementObject"
   BeaconKnowledgeMapPredicate:
-    properties:
-      relation:
-        type: "string"
-        description: "Human readable name of the maximal given predicate relation.\
-          \ This should be specified as Biolink predicate names like  gene_associated_with_condition.\
-          \ See [Biolink Model](https://biolink.github.io/biolink-model) for the full\
-          \ list of terms\n"
-  BeaconStatementPredicate:
+    type: "object"
     properties:
       edge_label:
         type: "string"
-        description: "minimal Biolink model predicate term"
+        description: "Human readable name of the 'minimal' standard Biolink Model\
+          \ predicate relationship name.   See [Biolink Model](https://biolink.github.io/biolink-model)\
+          \  for the full list of terms.\n"
       relation:
         type: "string"
-        description: "SHOULD be from maximal Biolink model predicate list, but beacon-specific\
-          \ extensions allowed. Preferred format is a CURIE, where one exists, but\
-          \ strings/labels acceptable. May be empty."
+        description: "Human readable name of a 'maximal' Biolink Model or beacon-specific\
+          \ (or Reasoner-specific) predicate relationship name.\n"
+      negated:
+        type: "boolean"
+  BeaconStatementCitation:
+    type: "object"
+    properties:
+      id:
+        type: "string"
+        description: "CURIE-encoded identifier to a citation to evidence supporting\
+          \ the given statement (e.g. PMID of a pubmed abstract)\n"
+      uri:
+        type: "string"
+        description: "(optional) expansion of the citation CURIE\n"
+      name:
+        type: "string"
+        description: "canonical human readable and searchable name of the citation\
+          \ (i.e. publication title, comment, etc.)\n"
+      evidence_type:
+        type: "string"
+        description: "class of evidence supporting the statement made in an edge -\
+          \ typically a class from the ECO ontology (e.g. ECO:0000220 'sequencing\
+          \ assay evidence', see [Evidence Ontology](http://purl.obolibrary.org/obo/eco.owl)\n"
+      date:
+        type: "string"
+        description: "publication date of annotation (generally of format 'yyyy-mm-dd')\n"
+  BeaconStatementPredicate:
+    type: "object"
+    properties:
+      edge_label:
+        type: "string"
+        description: "The predicate edge label associated with this statement, which\
+          \ should be as published by the /predicates API endpoint and must be taken\
+          \ from the minimal predicate ('slot') list of the [Biolink Model](https://biolink.github.io/biolink-model).\n"
+      relation:
+        type: "string"
+        description: "The predicate relation associated with this statement, which\
+          \ should be as published by the /predicates API endpoint with the preferred\
+          \ format being a CURIE where one exists, but strings/labels acceptable.\
+          \ This relation may be equivalent to the edge_label (e.g. edge_label: has_phenotype,\
+          \ relation: RO:0002200), or a more specific relation in cases where the\
+          \ source provides more granularity (e.g. edge_label: molecularly_interacts_with,\
+          \ relation: RO:0002447)"
+      negated:
+        type: "boolean"
+        description: "(Optional) a boolean that if set to true, indicates the edge\
+          \ statement is negated i.e. is not true\n"
   BeaconKnowledgeMapStatement:
+    type: "object"
     properties:
       subject:
         $ref: "#/definitions/BeaconKnowledgeMapSubject"
@@ -500,26 +516,26 @@ definitions:
         type: "string"
         description: "a description of the nature of the relationship\n"
   BeaconConcept:
+    type: "object"
     properties:
       id:
         type: "string"
-        description: "local object identifier for the concept in the specified knowledge\
+        description: "local object CURIE for the concept in the specified knowledge\
           \ source database\n"
       name:
         type: "string"
         description: "canonical human readable name of the concept\n"
-      category:
-        type: "string"
-        description: "concept semantic type\n"
-      synonyms:
+      categories:
         type: "array"
-        description: "list of synonyms for concept\n"
+        description: "concept semantic type 'category'. Should be specified from the\n\
+          [Biolink Model](https://biolink.github.io/biolink-model).\n"
         items:
           type: "string"
-      definition:
+      description:
         type: "string"
-        description: "concept definition\n"
+        description: "(optional) narrative concept definition\n"
   BeaconConceptDetail:
+    type: "object"
     properties:
       tag:
         type: "string"
@@ -527,30 +543,33 @@ definitions:
       value:
         type: "string"
         description: "property value\n"
+    description: "Any other metadata returned by the beacon as tag = value\n"
   BeaconPredicate:
+    type: "object"
     properties:
       id:
         type: "string"
         description: "CURIE-encoded identifier of predicate relation\n"
       uri:
         type: "string"
-        description: "The predicate URI which should generally resolves to the  full\
+        description: "The predicate URI which should generally resolves to the full\
           \ semantic description of the predicate relation"
       edge_label:
         type: "string"
-        description: "human readable name of a 'minimal' Biolink model predicate relation\n\
-          terms (see [Biolink Model](https://biolink.github.io/biolink-model) for\
-          \ the full list of terms)\n"
+        description: "A predicate edge label which must be taken from the minimal\
+          \ predicate ('slot') list of the [Biolink Model](https://biolink.github.io/biolink-model).\n"
       relation:
         type: "string"
-        description: "human readable name of a 'maximal' Biolink model predicate relation\n\
-          terms (see [Biolink Model](https://biolink.github.io/biolink-model) for\
-          \ the full list of terms)\n"
+        description: "The predicate relation, with the preferred format being a CURIE\
+          \ where one exists, but strings/labels acceptable. This relation  may be\
+          \ equivalent to the edge_label (e.g. edge_label: has_phenotype, relation:\
+          \ RO:0002200), or a more specific relation in cases where the source provides\
+          \ more granularity  (e.g. edge_label: molecularly_interacts_with, relation:\
+          \ RO:0002447)\n"
       local_id:
         type: "string"
         description: "CURIE-encoded identifier of the locally defined predicate relation.\
-          \ Such terms should be formally documented as mappings in the \n[Biolink\
-          \ Model](https://biolink.github.io/biolink-model)\n"
+          \ Such terms should be formally documented as mappings in the [Biolink Model](https://biolink.github.io/biolink-model)\n"
       local_uri:
         type: "string"
         description: "The predicate URI which should generally resolves  to the local\
@@ -567,6 +586,7 @@ definitions:
         description: "the number of statement entries using the specified predicate\
           \ in the given beacon knowledge base"
   ExactMatchResponse:
+    type: "object"
     properties:
       id:
         type: "string"
@@ -582,6 +602,7 @@ definitions:
         items:
           type: "string"
   BeaconStatementSubject:
+    type: "object"
     properties:
       id:
         type: "string"
@@ -589,12 +610,15 @@ definitions:
       name:
         type: "string"
         description: "human readable label of subject concept"
-      category:
-        type: "string"
+      categories:
+        type: "array"
         description: "a semantic group for the subject concept (specified as a code\
           \ gene, pathway, disease, etc. - see [Biolink Model](https://biolink.github.io/biolink-model)\
           \ for the full list of categories)\n"
+        items:
+          type: "string"
   BeaconConceptCategory:
+    type: "object"
     properties:
       id:
         type: "string"
@@ -611,7 +635,7 @@ definitions:
         description: "the locally designated CURIE of the concept category"
       local_uri:
         type: "string"
-        description: "This locally designated category URI should generally  resolve\
+        description: "This locally designated category URI should generally resolve\
           \ to the full semantic description of the category"
       local_category:
         type: "string"
@@ -624,11 +648,12 @@ definitions:
         description: "the number of concept entries of the specified type in the beacon\
           \ knowledge base"
   BeaconKnowledgeMapObject:
+    type: "object"
     properties:
       category:
         type: "string"
-        description: "the concept semantic type of a statement object. This \nshould\
-          \ be specified as Biolink concept semantic type names\nlike gene, pathway,\
+        description: "the concept semantic type of a statement object. This should\
+          \ be specified as Biolink concept semantic type names like gene, pathway,\
           \ etc. (see [Biolink Model](https://biolink.github.io/biolink-model) for\
           \ the full list of terms)\n"
       prefixes:
@@ -638,11 +663,12 @@ definitions:
           description: "the prefix of the namespace of statement object concept identifiers\
             \ which may conceivably be bound to the given relationship\n"
   BeaconKnowledgeMapSubject:
+    type: "object"
     properties:
       category:
         type: "string"
-        description: "the concept semantic type of a statement subject. This \nshould\
-          \ be specified as Biolink concept semantic type names \nlike gene, pathway,\
+        description: "the concept semantic type of a statement subject. This should\
+          \ be specified as Biolink concept semantic type names like gene, pathway,\
           \ etc. (see [Biolink Model](https://biolink.github.io/biolink-model) for\
           \ the full list of terms)\n"
       prefixes:
@@ -651,31 +677,91 @@ definitions:
           type: "string"
           description: "the prefix of the namespace of statement subject concept identifiers\
             \ which may conceivably be bound to the given relationship\n"
-  BeaconConceptWithDetails:
+  BeaconStatementWithDetails:
+    type: "object"
     properties:
       id:
         type: "string"
-        description: "local object identifier for the concept in the specified knowledge\
+        description: "Statement identifier of the statement made in an edge (echoed\
+          \ back)\n"
+      is_defined_by:
+        type: "string"
+        description: "A CURIE/URI for the translator group that wrapped this knowledge\
+          \ source ('beacon') that publishes the statement made in an edge.\n"
+      provided_by:
+        type: "string"
+        description: "A CURIE prefix, e.g. Pharos, MGI, Monarch. The group that curated/asserted\
+          \ the statement made in an edge.\n"
+      qualifiers:
+        type: "array"
+        description: "(Optional) terms representing qualifiers that modify or qualify\
+          \ the meaning of the statement made in an edge.\n"
+        items:
+          type: "string"
+      annotation:
+        type: "array"
+        description: "Extra edge properties, generally compliant with Translator Knowledge\
+          \ Graph Standard Specification\n"
+        items:
+          $ref: "#/definitions/BeaconStatementAnnotation"
+      evidence:
+        type: "array"
+        items:
+          $ref: "#/definitions/BeaconStatementCitation"
+  BeaconConceptWithDetails:
+    type: "object"
+    properties:
+      id:
+        type: "string"
+        description: "local object CURIE for the concept in the specified knowledge\
           \ source database\n"
+      uri:
+        type: "string"
+        description: "(optional) equivalent to expansion of the CURIE\n"
       name:
         type: "string"
         description: "canonical human readable name of the concept\n"
-      category:
+      symbol:
         type: "string"
-        description: "concept semantic type\n"
+        description: "(optional) symbol, used for genomic data\n"
+      categories:
+        type: "array"
+        description: "concept semantic type 'category'. Should be specified from the\n\
+          [Biolink Model](https://biolink.github.io/biolink-model).\n"
+        items:
+          type: "string"
+      description:
+        type: "string"
+        description: "(optional) narrative concept definition\n"
       synonyms:
         type: "array"
         description: "list of synonyms for concept\n"
         items:
           type: "string"
-      definition:
-        type: "string"
-        description: "concept definition\n"
+      exact_matches:
+        type: "array"
+        description: "List of [CURIE](https://www.w3.org/TR/curie/)  identifiers of\
+          \ concepts thought to be exactly matching concepts, [*sensa*-SKOS](http://www.w3.org/2004/02/skos/core#exactMatch).\
+          \ This is generally the same list returned by the /exact_matches endpoint\
+          \ (given the concept 'id' as input)\n"
+        items:
+          type: "string"
       details:
         type: "array"
         items:
           $ref: "#/definitions/BeaconConceptDetail"
+  BeaconStatementAnnotation:
+    type: "object"
+    properties:
+      tag:
+        type: "string"
+        description: "property name\n"
+      value:
+        type: "string"
+        description: "property value\n"
+    description: "Statement edge properties returned as tag = value pairs\n"
   BeaconStatementObject:
+    type: "object"
     properties:
       id:
         type: "string"
@@ -683,24 +769,10 @@ definitions:
       name:
         type: "string"
         description: "human readable label of object concept"
-      category:
-        type: "string"
+      categories:
+        type: "array"
         description: "a semantic group for the object concept (specified as a code\
           \ gene, pathway, disease, etc. - see [Biolink Model](https://biolink.github.io/biolink-model)\
           \ for the full list of categories)\n"
-  BeaconAnnotation:
-    properties:
-      id:
-        type: "string"
-        description: "CURIE-encoded identifier to an associated external resources\
-          \ (e.g. PMID of a pubmed citation)\n"
-      label:
-        type: "string"
-        description: "canonical human readable and searchable label of the annotation\
-          \ (i.e. comment, matched sentence, etc.)\n"
-      type:
-        type: "string"
-        description: "Gene Ontology Evidence Code (http://www.geneontology.org/page/guide-go-evidence-codes)\n"
-      date:
-        type: "string"
-        description: "publication date of annotation (generally of format 'yyyy-mm-dd')\n"
+        items:
+          type: "string"

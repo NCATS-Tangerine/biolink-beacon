@@ -6,7 +6,7 @@ from datetime import date, datetime  # noqa: F401
 from typing import List, Dict  # noqa: F401
 
 from swagger_server.models.base_model_ import Model
-from swagger_server.models.beacon_concept_detail import BeaconConceptDetail  # noqa: F401,E501
+from swagger_server.models.beacon_concept_detail import BeaconConceptDetail
 from swagger_server import util
 
 
@@ -16,45 +16,60 @@ class BeaconConceptWithDetails(Model):
     Do not edit the class manually.
     """
 
-    def __init__(self, id: str=None, name: str=None, category: str=None, synonyms: List[str]=None, definition: str=None, details: List[BeaconConceptDetail]=None):  # noqa: E501
+    def __init__(self, id: str=None, uri: str=None, name: str=None, symbol: str=None, categories: List[str]=None, description: str=None, synonyms: List[str]=None, exact_matches: List[str]=None, details: List[BeaconConceptDetail]=None):  # noqa: E501
         """BeaconConceptWithDetails - a model defined in Swagger
 
         :param id: The id of this BeaconConceptWithDetails.  # noqa: E501
         :type id: str
+        :param uri: The uri of this BeaconConceptWithDetails.  # noqa: E501
+        :type uri: str
         :param name: The name of this BeaconConceptWithDetails.  # noqa: E501
         :type name: str
-        :param category: The category of this BeaconConceptWithDetails.  # noqa: E501
-        :type category: str
+        :param symbol: The symbol of this BeaconConceptWithDetails.  # noqa: E501
+        :type symbol: str
+        :param categories: The categories of this BeaconConceptWithDetails.  # noqa: E501
+        :type categories: List[str]
+        :param description: The description of this BeaconConceptWithDetails.  # noqa: E501
+        :type description: str
         :param synonyms: The synonyms of this BeaconConceptWithDetails.  # noqa: E501
         :type synonyms: List[str]
-        :param definition: The definition of this BeaconConceptWithDetails.  # noqa: E501
-        :type definition: str
+        :param exact_matches: The exact_matches of this BeaconConceptWithDetails.  # noqa: E501
+        :type exact_matches: List[str]
         :param details: The details of this BeaconConceptWithDetails.  # noqa: E501
         :type details: List[BeaconConceptDetail]
         """
         self.swagger_types = {
             'id': str,
+            'uri': str,
             'name': str,
-            'category': str,
+            'symbol': str,
+            'categories': List[str],
+            'description': str,
             'synonyms': List[str],
-            'definition': str,
+            'exact_matches': List[str],
             'details': List[BeaconConceptDetail]
         }
 
         self.attribute_map = {
             'id': 'id',
+            'uri': 'uri',
             'name': 'name',
-            'category': 'category',
+            'symbol': 'symbol',
+            'categories': 'categories',
+            'description': 'description',
             'synonyms': 'synonyms',
-            'definition': 'definition',
+            'exact_matches': 'exact_matches',
             'details': 'details'
         }
 
         self._id = id
+        self._uri = uri
         self._name = name
-        self._category = category
+        self._symbol = symbol
+        self._categories = categories
+        self._description = description
         self._synonyms = synonyms
-        self._definition = definition
+        self._exact_matches = exact_matches
         self._details = details
 
     @classmethod
@@ -72,7 +87,7 @@ class BeaconConceptWithDetails(Model):
     def id(self) -> str:
         """Gets the id of this BeaconConceptWithDetails.
 
-        local object identifier for the concept in the specified knowledge source database   # noqa: E501
+        local object CURIE for the concept in the specified knowledge source database   # noqa: E501
 
         :return: The id of this BeaconConceptWithDetails.
         :rtype: str
@@ -83,13 +98,36 @@ class BeaconConceptWithDetails(Model):
     def id(self, id: str):
         """Sets the id of this BeaconConceptWithDetails.
 
-        local object identifier for the concept in the specified knowledge source database   # noqa: E501
+        local object CURIE for the concept in the specified knowledge source database   # noqa: E501
 
         :param id: The id of this BeaconConceptWithDetails.
         :type id: str
         """
 
         self._id = id
+
+    @property
+    def uri(self) -> str:
+        """Gets the uri of this BeaconConceptWithDetails.
+
+        (optional) equivalent to expansion of the CURIE   # noqa: E501
+
+        :return: The uri of this BeaconConceptWithDetails.
+        :rtype: str
+        """
+        return self._uri
+
+    @uri.setter
+    def uri(self, uri: str):
+        """Sets the uri of this BeaconConceptWithDetails.
+
+        (optional) equivalent to expansion of the CURIE   # noqa: E501
+
+        :param uri: The uri of this BeaconConceptWithDetails.
+        :type uri: str
+        """
+
+        self._uri = uri
 
     @property
     def name(self) -> str:
@@ -115,27 +153,73 @@ class BeaconConceptWithDetails(Model):
         self._name = name
 
     @property
-    def category(self) -> str:
-        """Gets the category of this BeaconConceptWithDetails.
+    def symbol(self) -> str:
+        """Gets the symbol of this BeaconConceptWithDetails.
 
-        concept semantic type   # noqa: E501
+        (optional) symbol, used for genomic data   # noqa: E501
 
-        :return: The category of this BeaconConceptWithDetails.
+        :return: The symbol of this BeaconConceptWithDetails.
         :rtype: str
         """
-        return self._category
+        return self._symbol
 
-    @category.setter
-    def category(self, category: str):
-        """Sets the category of this BeaconConceptWithDetails.
+    @symbol.setter
+    def symbol(self, symbol: str):
+        """Sets the symbol of this BeaconConceptWithDetails.
 
-        concept semantic type   # noqa: E501
+        (optional) symbol, used for genomic data   # noqa: E501
 
-        :param category: The category of this BeaconConceptWithDetails.
-        :type category: str
+        :param symbol: The symbol of this BeaconConceptWithDetails.
+        :type symbol: str
         """
 
-        self._category = category
+        self._symbol = symbol
+
+    @property
+    def categories(self) -> List[str]:
+        """Gets the categories of this BeaconConceptWithDetails.
+
+        concept semantic type 'category'. Should be specified from the [Biolink Model](https://biolink.github.io/biolink-model).   # noqa: E501
+
+        :return: The categories of this BeaconConceptWithDetails.
+        :rtype: List[str]
+        """
+        return self._categories
+
+    @categories.setter
+    def categories(self, categories: List[str]):
+        """Sets the categories of this BeaconConceptWithDetails.
+
+        concept semantic type 'category'. Should be specified from the [Biolink Model](https://biolink.github.io/biolink-model).   # noqa: E501
+
+        :param categories: The categories of this BeaconConceptWithDetails.
+        :type categories: List[str]
+        """
+
+        self._categories = categories
+
+    @property
+    def description(self) -> str:
+        """Gets the description of this BeaconConceptWithDetails.
+
+        (optional) narrative concept definition   # noqa: E501
+
+        :return: The description of this BeaconConceptWithDetails.
+        :rtype: str
+        """
+        return self._description
+
+    @description.setter
+    def description(self, description: str):
+        """Sets the description of this BeaconConceptWithDetails.
+
+        (optional) narrative concept definition   # noqa: E501
+
+        :param description: The description of this BeaconConceptWithDetails.
+        :type description: str
+        """
+
+        self._description = description
 
     @property
     def synonyms(self) -> List[str]:
@@ -161,27 +245,27 @@ class BeaconConceptWithDetails(Model):
         self._synonyms = synonyms
 
     @property
-    def definition(self) -> str:
-        """Gets the definition of this BeaconConceptWithDetails.
+    def exact_matches(self) -> List[str]:
+        """Gets the exact_matches of this BeaconConceptWithDetails.
 
-        concept definition   # noqa: E501
+        List of [CURIE](https://www.w3.org/TR/curie/)  identifiers of concepts thought to be exactly matching concepts, [*sensa*-SKOS](http://www.w3.org/2004/02/skos/core#exactMatch). This is generally the same list returned by the /exact_matches endpoint (given the concept 'id' as input)   # noqa: E501
 
-        :return: The definition of this BeaconConceptWithDetails.
-        :rtype: str
+        :return: The exact_matches of this BeaconConceptWithDetails.
+        :rtype: List[str]
         """
-        return self._definition
+        return self._exact_matches
 
-    @definition.setter
-    def definition(self, definition: str):
-        """Sets the definition of this BeaconConceptWithDetails.
+    @exact_matches.setter
+    def exact_matches(self, exact_matches: List[str]):
+        """Sets the exact_matches of this BeaconConceptWithDetails.
 
-        concept definition   # noqa: E501
+        List of [CURIE](https://www.w3.org/TR/curie/)  identifiers of concepts thought to be exactly matching concepts, [*sensa*-SKOS](http://www.w3.org/2004/02/skos/core#exactMatch). This is generally the same list returned by the /exact_matches endpoint (given the concept 'id' as input)   # noqa: E501
 
-        :param definition: The definition of this BeaconConceptWithDetails.
-        :type definition: str
+        :param exact_matches: The exact_matches of this BeaconConceptWithDetails.
+        :type exact_matches: List[str]
         """
 
-        self._definition = definition
+        self._exact_matches = exact_matches
 
     @property
     def details(self) -> List[BeaconConceptDetail]:

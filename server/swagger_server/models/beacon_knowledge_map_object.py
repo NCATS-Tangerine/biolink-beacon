@@ -51,7 +51,7 @@ class BeaconKnowledgeMapObject(Model):
     def category(self) -> str:
         """Gets the category of this BeaconKnowledgeMapObject.
 
-        the concept semantic type of a statement object. This  should be specified as Biolink concept semantic type names like gene, pathway, etc. (see [Biolink Model](https://biolink.github.io/biolink-model) for the full list of terms)   # noqa: E501
+        the concept semantic type of a statement object. This should be specified as Biolink concept semantic type names like gene, pathway, etc. (see [Biolink Model](https://biolink.github.io/biolink-model) for the full list of terms)   # noqa: E501
 
         :return: The category of this BeaconKnowledgeMapObject.
         :rtype: str
@@ -62,7 +62,7 @@ class BeaconKnowledgeMapObject(Model):
     def category(self, category: str):
         """Sets the category of this BeaconKnowledgeMapObject.
 
-        the concept semantic type of a statement object. This  should be specified as Biolink concept semantic type names like gene, pathway, etc. (see [Biolink Model](https://biolink.github.io/biolink-model) for the full list of terms)   # noqa: E501
+        the concept semantic type of a statement object. This should be specified as Biolink concept semantic type names like gene, pathway, etc. (see [Biolink Model](https://biolink.github.io/biolink-model) for the full list of terms)   # noqa: E501
 
         :param category: The category of this BeaconKnowledgeMapObject.
         :type category: str
