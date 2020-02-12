@@ -21,13 +21,13 @@ python3 -m swagger_server
 and open your browser to here:
 
 ```
-http://localhost:8080//ui/
+http://localhost:8080/beacon/biolink//ui/
 ```
 
 Your Swagger definition lives here:
 
 ```
-http://localhost:8080//swagger.json
+http://localhost:8080/beacon/biolink//swagger.json
 ```
 
 To launch the integration tests, use tox:

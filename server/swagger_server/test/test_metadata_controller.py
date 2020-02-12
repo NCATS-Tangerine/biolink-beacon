@@ -20,7 +20,7 @@ class TestMetadataController(BaseTestCase):
         
         """
         response = self.client.open(
-            '//categories',
+            '/beacon/biolink//categories',
             method='GET')
         self.assert200(response,
                        'Response body is : ' + response.data.decode('utf-8'))
@@ -31,7 +31,7 @@ class TestMetadataController(BaseTestCase):
         
         """
         response = self.client.open(
-            '//kmap',
+            '/beacon/biolink//kmap',
             method='GET')
         self.assert200(response,
                        'Response body is : ' + response.data.decode('utf-8'))
@@ -42,7 +42,7 @@ class TestMetadataController(BaseTestCase):
         
         """
         response = self.client.open(
-            '//predicates',
+            '/beacon/biolink//predicates',
             method='GET')
         self.assert200(response,
                        'Response body is : ' + response.data.decode('utf-8'))

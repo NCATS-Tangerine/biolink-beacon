@@ -20,7 +20,7 @@ class TestConceptsController(BaseTestCase):
         
         """
         response = self.client.open(
-            '//concepts/{conceptId}'.format(conceptId='conceptId_example'),
+            '/beacon/biolink//concepts/{conceptId}'.format(conceptId='conceptId_example'),
             method='GET')
         self.assert200(response,
                        'Response body is : ' + response.data.decode('utf-8'))
@@ -34,7 +34,7 @@ class TestConceptsController(BaseTestCase):
                         ('categories', 'categories_example'),
                         ('size', 56)]
         response = self.client.open(
-            '//concepts',
+            '/beacon/biolink//concepts',
             method='GET',
             query_string=query_string)
         self.assert200(response,
@@ -47,7 +47,7 @@ class TestConceptsController(BaseTestCase):
         """
         query_string = [('c', 'c_example')]
         response = self.client.open(
-            '//exactmatches',
+            '/beacon/biolink//exactmatches',
             method='GET',
             query_string=query_string)
         self.assert200(response,

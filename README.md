@@ -16,6 +16,7 @@ cd biolink-beacon
 ## Installing and Running without Docker
 
 First, create a virtual environment:
+
 ```shell
 python3.7 -m venv venv
 source venv/bin/activate
