@@ -21,7 +21,7 @@ tags:
 - name: "statements"
   description: "Queries relating to concept-relationship statements and their evidence"
 schemes:
-- "http"
+- "https"
 produces:
 - "application/json"
 paths:
