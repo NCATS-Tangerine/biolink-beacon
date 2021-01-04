@@ -95,7 +95,7 @@ http://localhost:8080/statements?s=MONDO:0009215&pageSize=1
 ```
 [
   {
-    "id": "BLM:06c7f4a5-65e5-4243-bbdd-ab92ced62997",
+    "id": "biolink:06c7f4a5-65e5-4243-bbdd-ab92ced62997",
     "object": {
       "id": "HP:0000252",
       "name": "Microcephaly",

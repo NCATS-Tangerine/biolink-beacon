@@ -6,7 +6,7 @@ class BiolinkTerm:
                 self.name = name
                 self.objectId = ''.join(x for x in name.title() if x.isalpha())
 
-	BIOLINK_PREFIX = "BLM"
+	BIOLINK_PREFIX = "biolink"
 	BIOLINK_BASEURI = "http://bioentity.io/vocab/"
 
 	def prefix():
